@@ -5,8 +5,8 @@
    These are safe to expose publicly (anon key, not service key).
    ============================================================ */
 
-export const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
-export const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
+export const SUPABASE_URL = 'https://bhmckjjdoxwfugtpphub.supabase.co';
+export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJobWNrampkb3h3ZnVndHBwaHViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzI5MDEsImV4cCI6MjA5MzA0ODkwMX0.YYQGcHn114nfmKo_TJW2NQgzzZz2V5HtFbvQlC8Csu0';
 
 export const APP_NAME = 'Krew';
 export const APP_URL = window.location.origin;
