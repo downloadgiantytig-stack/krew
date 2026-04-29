@@ -223,3 +223,125 @@
   pointer-events: none;
   border-radius: inherit;
 }
+
+/* ===== PREMIUM EFFECTS ===== */
+
+/* Smooth reveal animation */
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.animate-reveal {
+  animation: revealUp 0.8s var(--ease) both;
+}
+
+/* Scale up with blur */
+@keyframes scaleReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+.animate-scale-reveal {
+  animation: scaleReveal 0.6s var(--ease-spring) both;
+}
+
+/* Ambient light movement */
+@keyframes ambientGlow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    opacity: 0.7;
+    transform: translate(5%, -5%) scale(1.05);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translate(-3%, 3%) scale(0.98);
+  }
+  75% {
+    opacity: 0.8;
+    transform: translate(2%, 4%) scale(1.02);
+  }
+}
+
+/* Premium card entrance */
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(30px) rotateX(10deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
+}
+
+.animate-card-enter {
+  animation: cardEnter 0.6s var(--ease) both;
+}
+
+/* Stagger children animations */
+.stagger-children > * {
+  animation: fadeUp 0.5s var(--ease) both;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 50ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 100ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 150ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 200ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 250ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 350ms; }
+.stagger-children > *:nth-child(9) { animation-delay: 400ms; }
+.stagger-children > *:nth-child(10) { animation-delay: 450ms; }
+
+/* Responsive animation adjustments */
+@media (prefers-reduced-motion: reduce) {
+  .animate-reveal,
+  .animate-scale-reveal,
+  .animate-card-enter,
+  .animate-fade-up,
+  .animate-fade-in,
+  .animate-scale-in,
+  .animate-float,
+  .animate-float-slow,
+  .animate-glow-pulse,
+  .animate-spin-slow,
+  .stagger-children > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* Touch device optimizations - reduce motion intensity */
+@media (hover: none) and (pointer: coarse) {
+  .animate-float,
+  .animate-float-slow {
+    animation-duration: 12s;
+  }
+  
+  .animate-glow-pulse {
+    animation-duration: 5s;
+  }
+}
