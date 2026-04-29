@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Squads — Krew</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+</head>
+<body>
+<main class="page-content">
+  <div class="page-header">
+    <div class="glow-orb glow-orb-cyan" style="top:-80px;right:10%"></div>
+    <h1 class="animate-fade-up">Find your <span class="text-gradient">Squad</span></h1>
+    <p class="animate-fade-up delay-100">Join short-term project teams. Ship fast. Build your rep.</p>
+    <button class="btn btn-primary btn-lg" style="margin-top:var(--space-6)" id="create-squad-btn" onclick="openCreateModal()">
+      + Create a Squad
+    </button>
+  </div>
+
+  <div class="container" style="padding-bottom:var(--space-16)">
+    <!-- Filters -->
+    <div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-6);flex-wrap:wrap">
+      <div class="search-bar" style="flex:1;max-width:360px">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="search" id="squad-search" placeholder="Search squads…" oninput="filterSquads()">
+      </div>
+      <div class="filter-bar">
+        <button class="filter-chip active" data-status="all"         onclick="setStatus('all', this)">All</button>
+        <button class="filter-chip"        data-status="open"        onclick="setStatus('open', this)">🟢 Open</button>
+        <button class="filter-chip"        data-status="in_progress" onclick="setStatus('in_progress', this)">🟡 In Progress</button>
+        <button class="filter-chip"        data-status="completed"   onclick="setStatus('completed', this)">✅ Completed</button>
+      </div>
+    </div>
+
+    <!-- Skeletons -->
+    <div id="squads-loading" class="grid grid-auto-fill" style="gap:var(--space-5)">
+      ${Array(6).fill(0).map(() => `<div class="card" style="height:250px"><span class="skeleton" style="width:60px;height:22px;display:block;margin-bottom:12px;border-radius:99px"></span><span class="skeleton" style="width:75%;height:20px;display:block;margin-bottom:8px"></span><span class="skeleton" style="width:100%;height:14px;display:block;margin-bottom:5px"></span><span class="skeleton" style="width:85%;height:14px;display:block;margin-bottom:16px"></span></div>`).join('')}
+    </div>
+
+    <div id="squads-grid" class="grid grid-auto-fill" style="gap:var(--space-5)"></div>
+    <div id="squads-empty" class="empty-state hidden">
+      <div class="empty-icon">👥</div>
+      <h3>No squads found</h3>
+      <p>Be the first to create one!</p>
+    </div>
+  </div>
+</main>
+
+<!-- Create Squad Modal -->
+<div class="modal-overlay hidden" id="create-modal" onclick="handleOverlayClick(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title">Create a Squad</h2>
+      <button class="modal-close" onclick="closeCreateModal()">✕</button>
+    </div>
+
+    <form id="create-squad-form" style="display:flex;flex-direction:column;gap:var(--space-5)" onsubmit="submitSquad(event)">
+      <div class="form-group">
+        <label class="form-label">Squad Name *</label>
+        <input class="input" id="sq-name" placeholder="e.g. AI Receipt Scanner App" required maxlength="80">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description *</label>
+        <textarea class="input" id="sq-desc" placeholder="What are you building? What skills do you need?" rows="3" required></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)">
+        <div class="form-group">
+          <label class="form-label">Duration</label>
+          <select class="input select" id="sq-duration">
+            <option value="">Select…</option>
+            <option>1 week</option><option>2 weeks</option><option>1 month</option>
+            <option>2 months</option><option>3 months</option><option>Ongoing</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Max Members</label>
+          <input class="input" type="number" id="sq-max" value="5" min="2" max="20">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Payout Model</label>
+        <select class="input select" id="sq-payout">
+          <option value="">Select…</option>
+          <option>Revenue Split</option><option>Fixed Pay</option><option>Equity</option>
+          <option>Unpaid / Learning</option><option>Prize Pool</option><option>TBD</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tags <span style="color:var(--muted)">comma separated</span></label>
+        <input class="input" id="sq-tags" placeholder="React, Node.js, Web Scraping">
+      </div>
+      <div style="display:flex;gap:var(--space-3);margin-top:var(--space-2)">
+        <button type="button" class="btn btn-secondary flex-1" onclick="closeCreateModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary flex-1" id="create-submit-btn">Create Squad →</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script type="module">
+  import { initNav, showToast } from '/js/nav.js';
+  import { getSquads, createSquad } from '/js/db.js';
+  import { initAuth, getUser, requireAuth } from '/js/auth.js';
+  import { timeAgo, getInitials, getAvatarColor } from '/js/config.js';
+
+  await initNav('squads');
+  await initAuth();
+
+  window.openCreateModal = () => {
+    if (!requireAuth()) return;
+    document.getElementById('create-modal').classList.remove('hidden');
+  };
+  window.closeCreateModal = () => document.getElementById('create-modal').classList.add('hidden');
+  window.handleOverlayClick = (e) => { if (e.target === document.getElementById('create-modal')) closeCreateModal(); };
+
+  let allSquads = [];
+  let currentStatus = 'all';
+
+  function escHtml(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function renderCard(squad) {
+    const cnt  = squad.squad_members?.[0]?.count ?? 0;
+    const tags = (squad.tags || []).slice(0,4);
+    const c    = squad.creator || {};
+    const init = getInitials(c.full_name || c.username || '?');
+    const col  = getAvatarColor(c.username || '');
+    const sc   = { open:'badge-open', in_progress:'badge-progress', completed:'badge-closed'}[squad.status]||'badge-open';
+    const sl   = { open:'Open', in_progress:'In Progress', completed:'Completed'}[squad.status]||'Open';
+    return `
+      <a href="/squad?id=${squad.id}" class="card squad-card" style="text-decoration:none;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <span class="badge ${sc}">${sl}</span>
+          ${squad.duration?`<span class="category-chip">${escHtml(squad.duration)}</span>`:''}
+        </div>
+        <div>
+          <h3 style="font-size:1.0625rem;font-family:var(--font-display);font-weight:600;margin-bottom:6px">${escHtml(squad.name)}</h3>
+          <p style="font-size:0.8375rem;color:var(--muted-light);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${escHtml(squad.description||'')}</p>
+        </div>
+        ${tags.length?`<div class="tags">${tags.map(t=>`<span class="tag">${escHtml(t)}</span>`).join('')}</div>`:''}
+        ${squad.payout_model?`<span class="tag" style="width:fit-content;background:rgba(16,185,129,0.1);color:var(--green);border-color:rgba(16,185,129,0.2)">💰 ${escHtml(squad.payout_model)}</span>`:''}
+        <div style="display:flex;align-items:center;gap:10px;margin-top:auto;padding-top:12px;border-top:1px solid var(--border)">
+          <div class="avatar avatar-sm ${col}">${c.avatar_url?`<img src="${c.avatar_url}" alt="">`:`${init}`}</div>
+          <span style="font-size:0.8rem;color:var(--muted-light);flex:1">${escHtml(c.username||'anon')}</span>
+          <span style="font-size:0.8rem;color:var(--muted)">👥 ${cnt}/${squad.max_members||5}</span>
+          <span style="font-size:0.72rem;color:var(--muted)">${timeAgo(squad.created_at)}</span>
+        </div>
+      </a>
+    `;
+  }
+
+  function renderGrid(list) {
+    const grid  = document.getElementById('squads-grid');
+    const empty = document.getElementById('squads-empty');
+    if (!list.length) { grid.innerHTML=''; empty.classList.remove('hidden'); return; }
+    empty.classList.add('hidden');
+    grid.innerHTML = list.map(renderCard).join('');
+  }
+
+  window.filterSquads = () => {
+    const q = (document.getElementById('squad-search')?.value || '').toLowerCase();
+    let filtered = allSquads;
+    if (currentStatus !== 'all') filtered = filtered.filter(s => s.status === currentStatus);
+    if (q) filtered = filtered.filter(s => (s.name+s.description).toLowerCase().includes(q));
+    renderGrid(filtered);
+  };
+
+  window.setStatus = (status, el) => {
+    document.querySelectorAll('[data-status]').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    currentStatus = status;
+    filterSquads();
+  };
+
+  window.submitSquad = async (e) => {
+    e.preventDefault();
+    if (!requireAuth()) return;
+    const user = getUser();
+    const btn  = document.getElementById('create-submit-btn');
+    const rawTags = document.getElementById('sq-tags').value;
+    const tags    = rawTags.split(',').map(t=>t.trim()).filter(Boolean);
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>';
+    try {
+      await createSquad({
+        name:         document.getElementById('sq-name').value.trim(),
+        description:  document.getElementById('sq-desc').value.trim(),
+        duration:     document.getElementById('sq-duration').value || null,
+        max_members:  parseInt(document.getElementById('sq-max').value) || 5,
+        payout_model: document.getElementById('sq-payout').value || null,
+        tags,
+        creator_id: user.id,
+        status: 'open',
+      });
+      showToast('Squad created! 🚀', 'success');
+      closeCreateModal();
+      loadSquads();
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = 'Create Squad →';
+    }
+  };
+
+  async function loadSquads() {
+    document.getElementById('squads-loading').classList.remove('hidden');
+    document.getElementById('squads-grid').innerHTML = '';
+    try {
+      allSquads = await getSquads({ limit: 50 });
+      document.getElementById('squads-loading').classList.add('hidden');
+      filterSquads();
+    } catch (err) {
+      document.getElementById('squads-loading').classList.add('hidden');
+      showToast('Failed to load squads', 'error');
+    }
+  }
+
+  loadSquads();
+</script>
+</body>
+</html>

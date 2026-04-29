@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explore — Krew</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+</head>
+<body>
+  <main class="page-content">
+    <!-- Page header -->
+    <div class="page-header" style="padding-bottom:var(--space-8)">
+      <div class="glow-orb glow-orb-purple" style="top:-100px;left:50%;transform:translateX(-50%)"></div>
+      <h1 class="animate-fade-up">Explore <span class="text-gradient">Krew</span></h1>
+      <p class="animate-fade-up delay-100">Discover squads to join, products to buy, and builders to follow.</p>
+
+      <!-- Search -->
+      <div class="search-bar" style="max-width:500px;margin:var(--space-6) auto 0">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="search" id="search-input" placeholder="Search squads, products, skills…">
+      </div>
+    </div>
+
+    <div class="container" style="padding-bottom:var(--space-16)">
+      <!-- Filter tabs -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);margin-bottom:var(--space-6);flex-wrap:wrap">
+        <div class="tabs" style="width:auto">
+          <button class="tab active" data-filter="all">All</button>
+          <button class="tab" data-filter="squads">Squads 👥</button>
+          <button class="tab" data-filter="products">Marketplace 🛒</button>
+        </div>
+        <span id="result-count" style="font-size:0.8125rem;color:var(--muted-light)"></span>
+      </div>
+
+      <!-- Category chips (shows only when products filter active) -->
+      <div class="filter-bar" id="category-bar" style="margin-bottom:var(--space-6);display:none">
+        <span class="uppercase" style="color:var(--muted)">Category:</span>
+        <button class="filter-chip" data-category="script">⚡ Script</button>
+        <button class="filter-chip" data-category="automation">🤖 Automation</button>
+        <button class="filter-chip" data-category="template">📋 Template</button>
+        <button class="filter-chip" data-category="api">🔌 API</button>
+        <button class="filter-chip" data-category="design">🎨 Design</button>
+        <button class="filter-chip" data-category="tool">🛠️ Tool</button>
+      </div>
+
+      <!-- Skeleton loaders -->
+      <div id="feed-skeletons" class="grid grid-auto-fill" style="gap:var(--space-5)">
+        ${Array(6).fill(0).map(() => `
+          <div class="card" style="height:240px">
+            <div style="display:flex;gap:8px;margin-bottom:12px">
+              <span class="skeleton" style="width:60px;height:22px;border-radius:99px"></span>
+              <span class="skeleton" style="width:80px;height:22px;border-radius:99px"></span>
+            </div>
+            <span class="skeleton" style="width:80%;height:20px;display:block;margin-bottom:8px"></span>
+            <span class="skeleton" style="width:60%;height:16px;display:block;margin-bottom:16px"></span>
+            <span class="skeleton" style="width:100%;height:14px;display:block;margin-bottom:6px"></span>
+            <span class="skeleton" style="width:90%;height:14px;display:block;margin-bottom:6px"></span>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- Feed grid -->
+      <div id="feed-grid" class="grid grid-auto-fill" style="gap:var(--space-5)"></div>
+
+      <!-- Empty state -->
+      <div id="feed-empty" class="empty-state hidden">
+        <div class="empty-icon">🔭</div>
+        <h3>Nothing here yet</h3>
+        <p>Be the first to create a squad or list a product on the marketplace.</p>
+        <div style="display:flex;gap:12px;justify-content:center">
+          <a href="/squads" class="btn btn-outline">Create Squad</a>
+          <a href="/marketplace" class="btn btn-primary">List Product</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script type="module" src="/js/explore.js"></script>
+</body>
+</html>

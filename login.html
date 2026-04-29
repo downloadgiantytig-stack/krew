@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — Krew</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <style>
+    body { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+
+    .auth-orbs { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+    .auth-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      animation: floatSlow var(--dur, 10s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+
+    .auth-wrap {
+      width: 100%;
+      max-width: 460px;
+      padding: var(--space-6);
+      position: relative;
+      z-index: 2;
+    }
+
+    .auth-card {
+      background: rgba(10,10,26,0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-10) var(--space-8);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+      animation: scaleIn 0.4s var(--ease-spring);
+    }
+
+    .auth-logo {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      background: var(--grad-hero);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+      display: block;
+      margin-bottom: var(--space-8);
+      text-decoration: none;
+    }
+
+    .auth-tabs { margin-bottom: var(--space-8); }
+
+    .auth-form { display: flex; flex-direction: column; gap: var(--space-5); }
+
+    .auth-submit {
+      width: 100%;
+      margin-top: var(--space-2);
+    }
+
+    .auth-footer {
+      text-align: center;
+      margin-top: var(--space-6);
+      font-size: 0.875rem;
+      color: var(--muted-light);
+    }
+
+    .magic-section {
+      display: none; /* shown when magic tab active */
+    }
+
+    .form-section { display: none; }
+    .form-section.active { display: flex; flex-direction: column; gap: var(--space-5); }
+  </style>
+</head>
+<body>
+  <!-- Background orbs -->
+  <div class="auth-orbs" aria-hidden="true">
+    <div class="auth-orb" style="width:400px;height:400px;background:rgba(124,58,237,0.2);top:-100px;left:-100px;--dur:12s"></div>
+    <div class="auth-orb" style="width:300px;height:300px;background:rgba(6,182,212,0.15);bottom:-80px;right:-80px;--dur:10s;--delay:-4s"></div>
+    <div class="auth-orb" style="width:250px;height:250px;background:rgba(236,72,153,0.12);top:40%;right:-60px;--dur:8s;--delay:-2s"></div>
+  </div>
+
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <a href="/" class="auth-logo">KREW</a>
+
+      <div class="tabs auth-tabs" role="tablist">
+        <button class="tab active" id="tab-signin"  onclick="switchTab('signin')"  role="tab">Sign In</button>
+        <button class="tab"        id="tab-signup"  onclick="switchTab('signup')"  role="tab">Sign Up</button>
+        <button class="tab"        id="tab-magic"   onclick="switchTab('magic')"   role="tab">Magic Link</button>
+      </div>
+
+      <!-- Sign In -->
+      <div class="form-section active" id="section-signin">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="input" type="email" id="signin-email" placeholder="you@example.com" autocomplete="email" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="display:flex;justify-content:space-between">
+            Password
+            <a href="#" onclick="showReset()" style="font-size:0.8125rem;color:var(--purple-light)">Forgot?</a>
+          </label>
+          <input class="input" type="password" id="signin-password" placeholder="••••••••" autocomplete="current-password" required>
+        </div>
+        <button class="btn btn-primary auth-submit" id="signin-btn" onclick="handleSignIn()">
+          Sign In →
+        </button>
+      </div>
+
+      <!-- Sign Up -->
+      <div class="form-section" id="section-signup">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input class="input" type="text" id="signup-name" placeholder="Alex Johnson" autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <div class="input-group">
+            <span class="input-icon" style="left:12px;top:50%;transform:translateY(-50%);color:var(--muted-light);pointer-events:none">@</span>
+            <input class="input" style="padding-left:32px" type="text" id="signup-username" placeholder="your_handle" autocomplete="username" pattern="[a-z0-9_]{3,20}">
+          </div>
+          <span class="form-hint">3–20 chars, lowercase, letters/numbers/underscore</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="input" type="email" id="signup-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="input" type="password" id="signup-password" placeholder="Min. 8 characters" autocomplete="new-password" minlength="8">
+        </div>
+        <button class="btn btn-primary auth-submit" id="signup-btn" onclick="handleSignUp()">
+          Create Account →
+        </button>
+      </div>
+
+      <!-- Magic Link -->
+      <div class="form-section" id="section-magic">
+        <p style="font-size:0.875rem;color:var(--muted-light);line-height:1.6">
+          Enter your email and we'll send you a one-click sign-in link. No password needed.
+        </p>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="input" type="email" id="magic-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <button class="btn btn-primary auth-submit" id="magic-btn" onclick="handleMagicLink()">
+          Send Magic Link ✨
+        </button>
+        <div id="magic-success" style="display:none;text-align:center;padding:var(--space-6);background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:var(--radius)">
+          <div style="font-size:2rem;margin-bottom:var(--space-3)">📬</div>
+          <div style="font-weight:600;color:var(--green)">Check your email!</div>
+          <div style="font-size:0.875rem;color:var(--muted-light);margin-top:var(--space-2)">Click the link we sent to sign in instantly.</div>
+        </div>
+      </div>
+
+      <!-- Reset password (hidden by default) -->
+      <div class="form-section" id="section-reset">
+        <p style="font-size:0.875rem;color:var(--muted-light)">Enter your email and we'll send a reset link.</p>
+        <div class="form-group">
+          <input class="input" type="email" id="reset-email" placeholder="you@example.com">
+        </div>
+        <div style="display:flex;gap:var(--space-3)">
+          <button class="btn btn-secondary flex-1" onclick="switchTab('signin')">← Back</button>
+          <button class="btn btn-primary flex-1" onclick="handleReset()">Send Reset Link</button>
+        </div>
+      </div>
+
+      <div class="auth-footer" id="auth-footer">
+        Free forever. No credit card required.
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script type="module">
+    import { signIn, signUp, sendMagicLink, sendPasswordReset, initAuth, isLoggedIn } from '/js/auth.js';
+    import { showToast } from '/js/nav.js';
+    import { getQueryParam } from '/js/config.js';
+
+    // Make functions available globally
+    window.handleSignIn    = handleSignIn;
+    window.handleSignUp    = handleSignUp;
+    window.handleMagicLink = handleMagicLink;
+    window.handleReset     = handleReset;
+    window.switchTab       = switchTab;
+    window.showReset       = showReset;
+
+    // Check if already logged in
+    (async () => {
+      await initAuth();
+      if (isLoggedIn()) {
+        const redirect = getQueryParam('redirect') || '/explore';
+        window.location.href = redirect;
+      }
+      // Auto-select tab from query param
+      const mode = getQueryParam('mode');
+      if (mode === 'signup') switchTab('signup');
+      if (mode === 'magic')  switchTab('magic');
+      if (mode === 'reset')  showReset();
+    })();
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+      document.getElementById(`tab-${tab}`)?.classList.add('active');
+      document.getElementById(`section-${tab}`)?.classList.add('active');
+    }
+
+    function showReset() {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+      document.getElementById('section-reset').classList.add('active');
+    }
+
+    function setLoading(btnId, loading) {
+      const btn = document.getElementById(btnId);
+      if (!btn) return;
+      btn.disabled = loading;
+      btn.innerHTML = loading
+        ? `<span class="spinner"></span> Please wait...`
+        : btn.dataset.text || btn.innerHTML;
+    }
+
+    async function handleSignIn() {
+      const email    = document.getElementById('signin-email').value.trim();
+      const password = document.getElementById('signin-password').value;
+      if (!email || !password) { showToast('Please fill in all fields', 'error'); return; }
+
+      setLoading('signin-btn', true);
+      document.getElementById('signin-btn').dataset.text = 'Sign In →';
+      try {
+        await signIn({ email, password });
+        showToast('Welcome back! 🎉', 'success');
+        setTimeout(() => {
+          const redirect = getQueryParam('redirect') || '/explore';
+          window.location.href = redirect;
+        }, 800);
+      } catch (err) {
+        showToast(err.message || 'Sign in failed', 'error');
+        setLoading('signin-btn', false);
+      }
+    }
+
+    async function handleSignUp() {
+      const fullName = document.getElementById('signup-name').value.trim();
+      const username = document.getElementById('signup-username').value.trim().toLowerCase();
+      const email    = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+
+      if (!username || !email || !password) { showToast('Please fill in all fields', 'error'); return; }
+      if (!/^[a-z0-9_]{3,20}$/.test(username)) { showToast('Username must be 3-20 chars: a-z, 0-9, _', 'error'); return; }
+      if (password.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
+
+      document.getElementById('signup-btn').dataset.text = 'Create Account →';
+      setLoading('signup-btn', true);
+      try {
+        await signUp({ email, password, username, fullName });
+        showToast('Account created! Check your email to verify. ✉️', 'success', 6000);
+        document.getElementById('auth-footer').innerHTML =
+          `<strong style="color:var(--green)">✓ Account created!</strong> Check your email to verify, then <a href="#" onclick="switchTab('signin')" style="color:var(--purple-light)">sign in</a>.`;
+        setLoading('signup-btn', false);
+      } catch (err) {
+        showToast(err.message || 'Sign up failed', 'error');
+        setLoading('signup-btn', false);
+      }
+    }
+
+    async function handleMagicLink() {
+      const email = document.getElementById('magic-email').value.trim();
+      if (!email) { showToast('Enter your email', 'error'); return; }
+
+      document.getElementById('magic-btn').dataset.text = 'Send Magic Link ✨';
+      setLoading('magic-btn', true);
+      try {
+        await sendMagicLink(email);
+        document.getElementById('magic-btn').classList.add('hidden');
+        document.getElementById('magic-success').style.display = 'block';
+      } catch (err) {
+        showToast(err.message || 'Failed to send link', 'error');
+        setLoading('magic-btn', false);
+      }
+    }
+
+    async function handleReset() {
+      const email = document.getElementById('reset-email').value.trim();
+      if (!email) { showToast('Enter your email', 'error'); return; }
+      try {
+        await sendPasswordReset(email);
+        showToast('Reset link sent! Check your inbox.', 'success');
+        switchTab('signin');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+  </script>
+</body>
+</html>

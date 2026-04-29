@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product — Krew</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+</head>
+<body>
+<main class="page-content">
+  <!-- Loading -->
+  <div id="prod-loading" style="display:flex;align-items:center;justify-content:center;min-height:60vh">
+    <div class="spinner spinner-lg"></div>
+  </div>
+
+  <!-- Content -->
+  <div id="prod-content" class="hidden">
+    <div class="container" style="padding-top:var(--space-8);padding-bottom:var(--space-16)">
+      <a href="/marketplace" style="display:inline-flex;align-items:center;gap:6px;font-size:0.875rem;color:var(--muted-light);text-decoration:none;margin-bottom:var(--space-6);transition:color 0.2s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted-light)'">
+        ← Back to Marketplace
+      </a>
+
+      <div class="detail-layout">
+        <!-- Main -->
+        <div>
+          <!-- Preview image -->
+          <div id="prod-preview" style="width:100%;aspect-ratio:16/9;background:var(--bg-3);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:var(--space-8);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:5rem"></div>
+
+          <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-4);flex-wrap:wrap">
+            <span id="prod-cat-chip" class="category-chip"></span>
+            <span id="prod-time" style="font-size:0.8rem;color:var(--muted)"></span>
+          </div>
+          <h1 id="prod-title" style="font-family:var(--font-display);font-size:clamp(1.5rem,3vw,2rem);font-weight:700;margin-bottom:var(--space-5)"></h1>
+
+          <div id="prod-tags" class="tags" style="margin-bottom:var(--space-6)"></div>
+
+          <div class="card" style="margin-bottom:var(--space-6)">
+            <h3 style="font-size:1rem;font-weight:600;margin-bottom:var(--space-4)">About this product</h3>
+            <p id="prod-desc" style="font-size:0.9375rem;color:var(--muted-light);line-height:1.75;white-space:pre-wrap;word-break:break-word"></p>
+          </div>
+
+          <!-- Demo link -->
+          <div id="prod-demo-wrap" class="hidden card" style="margin-bottom:var(--space-6);display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-weight:600;margin-bottom:4px">Live Demo</div>
+              <div style="font-size:0.8375rem;color:var(--muted-light)">Try it before you buy</div>
+            </div>
+            <a id="prod-demo-link" href="#" target="_blank" rel="noopener" class="btn btn-secondary">View Demo ↗</a>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <!-- Buy card -->
+          <div class="card" style="text-align:center;border-color:var(--border-strong)">
+            <div id="prod-price" style="font-family:var(--font-display);font-size:2.5rem;font-weight:700;margin-bottom:var(--space-2)"></div>
+            <div style="font-size:0.8125rem;color:var(--muted-light);margin-bottom:var(--space-6)">one-time payment</div>
+            <a id="prod-buy-btn" href="#" target="_blank" rel="noopener" class="btn btn-primary btn-xl animate-glow-pulse w-full" style="justify-content:center;margin-bottom:var(--space-3)">Buy Now ↗</a>
+            <p style="font-size:0.75rem;color:var(--muted)">Powered by <span id="prod-checkout-label">Gumroad</span>. Secure checkout.</p>
+          </div>
+
+          <!-- Creator card -->
+          <div class="card">
+            <div class="uppercase" style="margin-bottom:var(--space-4)">Creator</div>
+            <div id="prod-creator"></div>
+          </div>
+
+          <!-- Stats -->
+          <div class="card">
+            <div class="uppercase" style="margin-bottom:var(--space-4)">Stats</div>
+            <div id="prod-stats" style="display:flex;flex-direction:column;gap:var(--space-3)"></div>
+          </div>
+
+          <!-- Share -->
+          <div class="card">
+            <div class="uppercase" style="margin-bottom:var(--space-4)">Share</div>
+            <button class="btn btn-secondary w-full" onclick="copyLink()">📋 Copy Link</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div id="prod-error" class="hidden" style="text-align:center;padding:var(--space-24) var(--space-6)">
+    <div style="font-size:3rem;margin-bottom:var(--space-4)">📦</div>
+    <h2>Product not found</h2>
+    <a href="/marketplace" class="btn btn-primary" style="margin-top:var(--space-6)">Browse Marketplace</a>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script type="module">
+  import { initNav, showToast } from '/js/nav.js';
+  import { getProduct } from '/js/db.js';
+  import { initAuth } from '/js/auth.js';
+  import { getQueryParam, timeAgo, formatPrice, getInitials, getAvatarColor, CATEGORIES } from '/js/config.js';
+
+  await initNav('marketplace');
+  await initAuth();
+
+  const productId = getQueryParam('id');
+
+  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  async function loadProduct() {
+    if (!productId) { showError(); return; }
+    try {
+      const p = await getProduct(productId);
+      if (!p) { showError(); return; }
+
+      document.title = `${p.title} — Krew Marketplace`;
+
+      const cat = CATEGORIES.find(c=>c.value===p.category)||{emoji:'📦',label:'Other'};
+      const cr  = p.creator||{};
+      const init= getInitials(cr.full_name||cr.username||'?');
+      const col = getAvatarColor(cr.username||'');
+      const isGumroad = p.checkout_type === 'gumroad';
+
+      // Preview
+      const previewEl = document.getElementById('prod-preview');
+      if (p.preview_image_url) {
+        previewEl.innerHTML = `<img src="${esc(p.preview_image_url)}" alt="${esc(p.title)}" style="width:100%;height:100%;object-fit:cover">`;
+      } else {
+        previewEl.textContent = cat.emoji;
+        previewEl.style.background = 'linear-gradient(135deg, var(--bg-3), var(--bg-2))';
+      }
+
+      // Category & time
+      document.getElementById('prod-cat-chip').textContent = `${cat.emoji} ${cat.label}`;
+      document.getElementById('prod-time').textContent = `Listed ${timeAgo(p.created_at)}`;
+
+      // Title & desc
+      document.getElementById('prod-title').textContent = p.title;
+      document.getElementById('prod-desc').textContent  = p.description || '';
+
+      // Tags
+      const tagsEl = document.getElementById('prod-tags');
+      tagsEl.innerHTML = (p.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
+
+      // Demo link
+      if (p.demo_url) {
+        const demoWrap = document.getElementById('prod-demo-wrap');
+        demoWrap.classList.remove('hidden');
+        demoWrap.style.display = 'flex';
+        document.getElementById('prod-demo-link').href = p.demo_url;
+      }
+
+      // Price
+      const priceEl = document.getElementById('prod-price');
+      if (!p.price_usd) {
+        priceEl.textContent = 'Free';
+        priceEl.style.color = 'var(--green)';
+      } else {
+        priceEl.textContent = formatPrice(p.price_usd);
+      }
+
+      // Buy button
+      const buyBtn = document.getElementById('prod-buy-btn');
+      buyBtn.href  = p.checkout_url;
+      buyBtn.textContent = !p.price_usd ? 'Get for Free ↗' : isGumroad ? 'Buy on Gumroad ↗' : 'Buy Now ↗';
+      document.getElementById('prod-checkout-label').textContent = isGumroad ? 'Gumroad' : 'External checkout';
+
+      // Creator
+      document.getElementById('prod-creator').innerHTML = `
+        <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-4)">
+          <a href="/profile?u=${esc(cr.username)}" class="avatar avatar-lg ${col}" style="text-decoration:none">
+            ${cr.avatar_url?`<img src="${esc(cr.avatar_url)}" alt="">`:`${init}`}
+          </a>
+          <div>
+            <a href="/profile?u=${esc(cr.username)}" style="font-weight:600;display:block;color:var(--text)">${esc(cr.full_name||cr.username)}</a>
+            <div style="font-size:0.8rem;color:var(--muted-light)">@${esc(cr.username)}</div>
+          </div>
+        </div>
+        ${cr.bio?`<p style="font-size:0.875rem;color:var(--muted-light);line-height:1.6">${esc(cr.bio)}</p>`:''}
+        ${cr.github_url?`<a href="${esc(cr.github_url)}" target="_blank" class="btn btn-secondary btn-sm w-full" style="margin-top:12px;justify-content:center">GitHub Profile ↗</a>`:''}
+      `;
+
+      // Stats
+      document.getElementById('prod-stats').innerHTML = `
+        <div style="display:flex;justify-content:space-between;font-size:0.875rem">
+          <span style="color:var(--muted-light)">Downloads</span>
+          <span style="font-weight:600">${p.downloads_count||0}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.875rem">
+          <span style="color:var(--muted-light)">Listed</span>
+          <span style="font-weight:500">${new Date(p.created_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.875rem">
+          <span style="color:var(--muted-light)">Category</span>
+          <span style="font-weight:500">${cat.emoji} ${cat.label}</span>
+        </div>
+      `;
+
+      document.getElementById('prod-loading').style.display = 'none';
+      document.getElementById('prod-content').classList.remove('hidden');
+    } catch (err) {
+      console.error(err);
+      showError();
+    }
+  }
+
+  function showError() {
+    document.getElementById('prod-loading').style.display='none';
+    document.getElementById('prod-error').classList.remove('hidden');
+  }
+
+  window.copyLink = () => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      showToast('Link copied! ✓','success');
+    }).catch(() => {
+      showToast('Could not copy link','error');
+    });
+  };
+
+  loadProduct();
+</script>
+</body>
+</html>

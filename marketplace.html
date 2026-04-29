@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketplace — Krew</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+</head>
+<body>
+<main class="page-content">
+  <div class="page-header">
+    <div class="glow-orb glow-orb-pink" style="top:-80px;left:20%"></div>
+    <h1 class="animate-fade-up">The <span class="text-gradient">Marketplace</span></h1>
+    <p class="animate-fade-up delay-100">Scripts, automations &amp; templates — sold directly by builders. 0% platform fee.</p>
+    <button class="btn btn-primary btn-lg" style="margin-top:var(--space-6)" id="list-btn" onclick="openListModal()">
+      + Sell Your Product
+    </button>
+  </div>
+
+  <div class="container" style="padding-bottom:var(--space-16)">
+    <!-- Filters -->
+    <div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-6);flex-wrap:wrap">
+      <div class="search-bar" style="flex:1;max-width:360px">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="search" id="mp-search" placeholder="Search products…" oninput="filterProducts()">
+      </div>
+      <div class="filter-bar" id="cat-filter">
+        <button class="filter-chip active" data-cat="" onclick="setCat('',this)">All</button>
+        <button class="filter-chip" data-cat="script"     onclick="setCat('script',this)">⚡ Script</button>
+        <button class="filter-chip" data-cat="automation" onclick="setCat('automation',this)">🤖 Automation</button>
+        <button class="filter-chip" data-cat="template"   onclick="setCat('template',this)">📋 Template</button>
+        <button class="filter-chip" data-cat="api"        onclick="setCat('api',this)">🔌 API</button>
+        <button class="filter-chip" data-cat="design"     onclick="setCat('design',this)">🎨 Design</button>
+        <button class="filter-chip" data-cat="tool"       onclick="setCat('tool',this)">🛠️ Tool</button>
+      </div>
+    </div>
+
+    <!-- Skeletons -->
+    <div id="mp-loading" class="grid grid-auto-fill" style="gap:var(--space-5)">
+      ${Array(8).fill(0).map(() => `<div class="card product-card" style="padding:0"><div class="skeleton" style="height:160px;border-radius:var(--radius) var(--radius) 0 0"></div><div style="padding:16px"><span class="skeleton" style="width:60px;height:18px;display:block;margin-bottom:10px;border-radius:99px"></span><span class="skeleton" style="width:85%;height:18px;display:block;margin-bottom:6px"></span><span class="skeleton" style="width:60%;height:16px;display:block;margin-bottom:16px"></span><div style="display:flex;justify-content:space-between;align-items:center"><span class="skeleton" style="width:50px;height:24px;display:block"></span><span class="skeleton" style="width:90px;height:32px;display:block;border-radius:8px"></span></div></div></div>`).join('')}
+    </div>
+
+    <div id="mp-grid" class="grid grid-auto-fill" style="gap:var(--space-5)"></div>
+    <div id="mp-empty" class="empty-state hidden">
+      <div class="empty-icon">🛒</div>
+      <h3>No products yet</h3>
+      <p>Be the first to list a script or template!</p>
+    </div>
+  </div>
+</main>
+
+<!-- List Product Modal -->
+<div class="modal-overlay hidden" id="list-modal" onclick="handleOverlay(event)">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:580px">
+    <div class="modal-header">
+      <h2 class="modal-title">List a Product</h2>
+      <button class="modal-close" onclick="closeListModal()">✕</button>
+    </div>
+
+    <form id="list-form" style="display:flex;flex-direction:column;gap:var(--space-5)" onsubmit="submitProduct(event)">
+      <div class="form-group">
+        <label class="form-label">Product Title *</label>
+        <input class="input" id="p-title" placeholder="e.g. LinkedIn Auto Connect Script" required maxlength="100">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description *</label>
+        <textarea class="input" id="p-desc" placeholder="What does it do? Who is it for? What's included?" rows="4" required></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)">
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select class="input select" id="p-cat" required>
+            <option value="">Select category…</option>
+            <option value="script">⚡ Script</option>
+            <option value="automation">🤖 Automation</option>
+            <option value="template">📋 Template</option>
+            <option value="api">🔌 API / SDK</option>
+            <option value="design">🎨 Design</option>
+            <option value="tool">🛠️ Tool</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Price (USD)</label>
+          <input class="input" type="number" id="p-price" placeholder="0 = Free" min="0" step="0.01">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Checkout URL * <span style="color:var(--muted)">(Gumroad, Lemon Squeezy, or any link)</span></label>
+        <input class="input" type="url" id="p-checkout" placeholder="https://yourname.gumroad.com/l/product" required>
+        <span class="form-hint">Buyers will be sent directly to this URL. You keep 100% of sales.</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Preview Image URL <span style="color:var(--muted)">optional</span></label>
+        <input class="input" type="url" id="p-image" placeholder="https://i.imgur.com/yourimage.png">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Demo URL <span style="color:var(--muted)">optional</span></label>
+        <input class="input" type="url" id="p-demo" placeholder="https://yourdemo.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tags <span style="color:var(--muted)">comma separated</span></label>
+        <input class="input" id="p-tags" placeholder="Python, Automation, LinkedIn">
+      </div>
+      <div style="display:flex;gap:var(--space-3);margin-top:var(--space-2)">
+        <button type="button" class="btn btn-secondary flex-1" onclick="closeListModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary flex-1" id="list-submit">Publish →</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script type="module">
+  import { initNav, showToast } from '/js/nav.js';
+  import { getProducts, createProduct } from '/js/db.js';
+  import { initAuth, getUser, requireAuth } from '/js/auth.js';
+  import { timeAgo, formatPrice, getInitials, getAvatarColor, CATEGORIES } from '/js/config.js';
+
+  await initNav('marketplace');
+  await initAuth();
+
+  window.openListModal  = () => { if (!requireAuth()) return; document.getElementById('list-modal').classList.remove('hidden'); };
+  window.closeListModal = () => document.getElementById('list-modal').classList.add('hidden');
+  window.handleOverlay  = (e) => { if (e.target === document.getElementById('list-modal')) closeListModal(); };
+
+  let allProducts = [];
+  let activeCat   = '';
+
+  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  function renderCard(p) {
+    const cat  = CATEGORIES.find(c=>c.value===p.category)||{emoji:'📦',label:'Other'};
+    const c    = p.creator||{};
+    const init = getInitials(c.full_name||c.username||'?');
+    const col  = getAvatarColor(c.username||'');
+    const isg  = p.checkout_type === 'gumroad';
+    return `
+      <div class="card product-card" onclick="window.location='/product?id=${p.id}'" style="cursor:pointer">
+        <div class="preview" style="height:160px">
+          ${p.preview_image_url
+            ? `<img src="${esc(p.preview_image_url)}" alt="${esc(p.title)}" loading="lazy">`
+            : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:3rem;background:linear-gradient(135deg,var(--bg-3),var(--bg-2))">${cat.emoji}</div>`}
+        </div>
+        <div class="card-body">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <span class="category-chip">${cat.emoji} ${cat.label}</span>
+            <span style="font-size:0.72rem;color:var(--muted)">${timeAgo(p.created_at)}</span>
+          </div>
+          <h3 style="font-size:1rem;font-family:var(--font-display);font-weight:600;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(p.title)}</h3>
+          ${(p.tags||[]).length?`<div class="tags" style="margin-bottom:8px">${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <div class="avatar avatar-sm ${col}">${c.avatar_url?`<img src="${esc(c.avatar_url)}" alt="">`:init}</div>
+            <span style="font-size:0.8rem;color:var(--muted-light)">${esc(c.username||'anon')}</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span style="font-family:var(--font-display);font-size:1.25rem;font-weight:700;${!p.price_usd?'color:var(--green)':''}">${formatPrice(p.price_usd)}</span>
+            <a href="${esc(p.checkout_url)}" target="_blank" rel="noopener" class="btn btn-primary btn-sm" onclick="event.stopPropagation()">${isg?'Gumroad':'Buy'} ↗</a>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderGrid(list) {
+    const grid  = document.getElementById('mp-grid');
+    const empty = document.getElementById('mp-empty');
+    if (!list.length) { grid.innerHTML=''; empty.classList.remove('hidden'); return; }
+    empty.classList.add('hidden');
+    grid.innerHTML = list.map(renderCard).join('');
+  }
+
+  window.filterProducts = () => {
+    const q = (document.getElementById('mp-search')?.value||'').toLowerCase();
+    let f = allProducts;
+    if (activeCat) f = f.filter(p=>p.category===activeCat);
+    if (q) f = f.filter(p=>(p.title+p.description).toLowerCase().includes(q));
+    renderGrid(f);
+  };
+
+  window.setCat = (cat, el) => {
+    document.querySelectorAll('[data-cat]').forEach(b=>b.classList.remove('active'));
+    el.classList.add('active');
+    activeCat = cat;
+    filterProducts();
+  };
+
+  window.submitProduct = async (e) => {
+    e.preventDefault();
+    if (!requireAuth()) return;
+    const user = getUser();
+    const btn  = document.getElementById('list-submit');
+    const rawTags = document.getElementById('p-tags').value;
+    const tags    = rawTags.split(',').map(t=>t.trim()).filter(Boolean);
+    const price   = parseFloat(document.getElementById('p-price').value)||0;
+    const checkoutUrl = document.getElementById('p-checkout').value.trim();
+    const isGumroad   = checkoutUrl.includes('gumroad.com');
+
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+    try {
+      await createProduct({
+        title:           document.getElementById('p-title').value.trim(),
+        description:     document.getElementById('p-desc').value.trim(),
+        category:        document.getElementById('p-cat').value,
+        price_usd:       price || null,
+        checkout_url:    checkoutUrl,
+        checkout_type:   isGumroad ? 'gumroad' : 'external',
+        preview_image_url: document.getElementById('p-image').value.trim()||null,
+        demo_url:        document.getElementById('p-demo').value.trim()||null,
+        tags,
+        creator_id: user.id,
+      });
+      showToast('Product listed! 🎉', 'success');
+      closeListModal();
+      loadProducts();
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      btn.disabled=false; btn.innerHTML='Publish →';
+    }
+  };
+
+  async function loadProducts() {
+    document.getElementById('mp-loading').classList.remove('hidden');
+    document.getElementById('mp-grid').innerHTML='';
+    try {
+      allProducts = await getProducts({ limit:60 });
+      document.getElementById('mp-loading').classList.add('hidden');
+      filterProducts();
+    } catch(err) {
+      document.getElementById('mp-loading').classList.add('hidden');
+      showToast('Failed to load products','error');
+    }
+  }
+
+  loadProducts();
+</script>
+</body>
+</html>
