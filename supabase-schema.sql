@@ -102,6 +102,20 @@ alter table products      enable row level security;
 alter table posts         enable row level security;
 alter table likes         enable row level security;
 
+-- Drop all policies first so re-running this script never errors
+drop policy if exists "Public profiles"          on profiles;
+drop policy if exists "Own profile write"        on profiles;
+drop policy if exists "Public squads"            on squads;
+drop policy if exists "Creator manages squad"    on squads;
+drop policy if exists "Public squad members"     on squad_members;
+drop policy if exists "Own membership"           on squad_members;
+drop policy if exists "Public products"          on products;
+drop policy if exists "Creator manages product"  on products;
+drop policy if exists "Public posts"             on posts;
+drop policy if exists "Author post write"        on posts;
+drop policy if exists "Public likes"             on likes;
+drop policy if exists "Own likes"                on likes;
+
 -- PROFILES: read all, write own
 create policy "Public profiles"   on profiles for select using (true);
 create policy "Own profile write" on profiles for all    using (auth.uid() = id);
@@ -119,8 +133,8 @@ create policy "Public products"          on products for select using (true);
 create policy "Creator manages product"  on products for all    using (auth.uid() = creator_id);
 
 -- POSTS: read all, write own
-create policy "Public posts"     on posts for select using (true);
-create policy "Author post write"on posts for all    using (auth.uid() = author_id);
+create policy "Public posts"      on posts for select using (true);
+create policy "Author post write" on posts for all    using (auth.uid() = author_id);
 
 -- LIKES: read all, write own
 create policy "Public likes" on likes for select using (true);
