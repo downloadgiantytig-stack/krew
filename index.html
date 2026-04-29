@@ -2,41 +2,47 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Krew — Build Fast. Ship Together. Earn Now.</title>
   <meta name="description" content="Join quick squads, ship projects in weeks, and sell your scripts & automations. The platform where builders make money fast.">
   <meta property="og:title" content="Krew — Build Fast. Ship Together. Earn Now.">
   <meta property="og:description" content="Short-term squads. Instant marketplace. Zero overhead.">
-  <meta property="og:type" content="website">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-  <!-- CSS -->
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/animations.css">
   <link rel="stylesheet" href="/css/components.css">
   <link rel="stylesheet" href="/css/layout.css">
 
-  <style>
-    /* Landing-specific styles */
-    body { overflow-x: hidden; }
+  <!-- Three.js import map — enables three/addons/ imports -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three":          "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/":  "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
 
-    /* ---- Three.js Canvas ---- */
+  <style>
+    /* ---- Canvas ---- */
     #bg-canvas {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      inset: 0;
+      width: 100%;
+      height: 100%;
       z-index: 0;
       pointer-events: all;
+      touch-action: pan-y; /* allow vertical scroll on mobile */
     }
 
     /* ---- Hero ---- */
     .hero {
-      min-height: 100vh;
+      min-height: 100svh;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -44,7 +50,7 @@
       text-align: center;
       position: relative;
       z-index: 2;
-      padding: 120px var(--space-6) var(--space-16);
+      padding: clamp(100px, 20vw, 140px) var(--space-5) var(--space-16);
       pointer-events: none;
     }
     .hero > * { pointer-events: auto; }
@@ -53,16 +59,16 @@
       display: inline-flex;
       align-items: center;
       gap: var(--space-2);
-      font-size: 0.75rem;
+      font-size: clamp(0.65rem, 2vw, 0.75rem);
       font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--purple-light);
-      background: rgba(124,58,237,0.1);
-      border: 1px solid rgba(124,58,237,0.25);
+      background: rgba(124,58,237,0.12);
+      border: 1px solid rgba(124,58,237,0.3);
       padding: 6px 16px;
       border-radius: var(--radius-full);
-      margin-bottom: var(--space-6);
+      margin-bottom: var(--space-5);
       animation: fadeUp 0.6s ease both;
     }
     .hero-eyebrow::before {
@@ -74,22 +80,24 @@
       animation: glowPulse 2s ease-in-out infinite;
     }
 
+    /* Big KREW title */
     .hero-title {
       font-family: var(--font-display);
-      font-size: clamp(4rem, 12vw, 9rem);
+      font-size: clamp(4.5rem, 18vw, 10rem);
       font-weight: 700;
       letter-spacing: -0.05em;
       line-height: 0.9;
-      margin-bottom: var(--space-6);
-      overflow: hidden;
+      margin-bottom: var(--space-5);
     }
-
     .hero-title .char {
       display: inline-block;
       animation: charIn 0.8s var(--ease-spring) both;
     }
-
-    .hero-title .gradient-word {
+    @keyframes charIn {
+      from { opacity: 0; transform: translateY(70px) rotate(4deg); }
+      to   { opacity: 1; transform: translateY(0) rotate(0deg); }
+    }
+    .grad-char {
       background: linear-gradient(135deg, #A855F7 0%, #EC4899 50%, #06B6D4 100%);
       background-size: 200% 200%;
       animation: charIn 0.8s var(--ease-spring) both, gradientShift 4s ease infinite;
@@ -98,76 +106,115 @@
       background-clip: text;
     }
 
-    @keyframes charIn {
-      from { opacity: 0; transform: translateY(60px) rotate(3deg); }
-      to   { opacity: 1; transform: translateY(0) rotate(0deg); }
-    }
-
     .hero-subtitle {
-      font-size: clamp(1rem, 2.5vw, 1.375rem);
+      font-size: clamp(0.95rem, 3vw, 1.25rem);
       color: var(--muted-light);
-      max-width: 600px;
-      line-height: 1.6;
-      margin-bottom: var(--space-10);
+      max-width: min(580px, 90vw);
+      line-height: 1.65;
+      margin-bottom: var(--space-8);
       animation: fadeUp 0.7s ease 0.4s both;
     }
 
     .hero-actions {
       display: flex;
       align-items: center;
-      gap: var(--space-4);
+      gap: var(--space-3);
       flex-wrap: wrap;
       justify-content: center;
       animation: fadeUp 0.7s ease 0.6s both;
+      width: 100%;
+      max-width: 420px;
+    }
+    .hero-actions .btn {
+      flex: 1;
+      min-width: 160px;
+      justify-content: center;
     }
 
-    .hero-floating-chips {
+    /* Floating chips — hidden on mobile */
+    .hero-chips {
       position: absolute;
       inset: 0;
       pointer-events: none;
       overflow: hidden;
     }
-
     .floating-chip {
       position: absolute;
       padding: 6px 14px;
       border-radius: var(--radius-full);
-      font-size: 0.75rem;
+      font-size: clamp(0.65rem, 1.5vw, 0.75rem);
       font-weight: 600;
-      background: rgba(255,255,255,0.04);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.12);
       color: var(--text-secondary);
       white-space: nowrap;
       animation: float var(--dur, 6s) ease-in-out infinite;
       animation-delay: var(--delay, 0s);
     }
+    @media (max-width: 640px) { .hero-chips { display: none; } }
 
-    /* ---- Scroll indicator ---- */
+    /* Scroll cue */
     .scroll-cue {
       position: absolute;
-      bottom: var(--space-8);
+      bottom: clamp(16px, 4vw, 32px);
       left: 50%;
       transform: translateX(-50%);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: var(--space-2);
+      gap: 6px;
       color: var(--muted);
-      font-size: 0.75rem;
-      letter-spacing: 0.08em;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       animation: bounce 2s ease-in-out infinite;
       cursor: pointer;
       z-index: 3;
     }
-    .scroll-cue svg { opacity: 0.5; }
 
-    /* ---- Section styles ---- */
+    /* ---- Stats ---- */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      margin: clamp(24px, 5vw, 64px) 0;
+      position: relative;
+      z-index: 2;
+    }
+    .stat-item {
+      padding: clamp(20px, 4vw, 48px) clamp(12px, 3vw, 40px);
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 6vw, 4rem);
+      font-weight: 700;
+      background: var(--grad-hero);
+      background-size: 200%;
+      animation: gradientShift 5s ease infinite;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block;
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: clamp(0.7rem, 2vw, 0.9375rem);
+      color: var(--muted-light);
+      margin-top: var(--space-2);
+    }
+
+    /* ---- Landing sections ---- */
     .landing-section {
       position: relative;
       z-index: 2;
-      padding: var(--space-24) 0;
+      padding: clamp(48px, 8vw, 96px) 0;
     }
 
     .section-label {
@@ -179,51 +226,50 @@
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--cyan);
-      margin-bottom: var(--space-5);
+      margin-bottom: var(--space-4);
     }
     .section-label::before {
       content: '';
       display: block;
-      width: 24px;
+      width: 20px;
       height: 1px;
       background: var(--cyan);
     }
 
     .section-heading {
       font-family: var(--font-display);
-      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-size: clamp(1.75rem, 4vw, 3.5rem);
       font-weight: 700;
       letter-spacing: -0.03em;
       line-height: 1.1;
-      margin-bottom: var(--space-5);
+      margin-bottom: var(--space-4);
     }
 
     .section-desc {
-      font-size: 1.0625rem;
+      font-size: clamp(0.9rem, 2vw, 1.0625rem);
       color: var(--muted-light);
       line-height: 1.7;
-      max-width: 520px;
+      max-width: 500px;
     }
 
-    /* ---- Feature cards on landing ---- */
+    /* Feature grid */
     .feature-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--space-5);
-      margin-top: var(--space-12);
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--space-4);
+      margin-top: clamp(32px, 5vw, 56px);
     }
-
     .feature-card {
       padding: var(--space-6);
-      background: var(--surface);
+      background: rgba(255,255,255,0.03);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       transition: transform var(--trans), border-color var(--trans), box-shadow var(--trans);
     }
     .feature-card:hover {
       transform: translateY(-4px);
-      border-color: var(--border-strong);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      border-color: rgba(124,58,237,0.35);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 20px rgba(124,58,237,0.1);
     }
     .feature-icon {
       width: 48px; height: 48px;
@@ -231,112 +277,62 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 1.5rem;
       margin-bottom: var(--space-4);
-      background: var(--surface-hover);
-      border: 1px solid var(--border);
+      background: rgba(124,58,237,0.1);
+      border: 1px solid rgba(124,58,237,0.2);
     }
-    .feature-card h3 {
-      font-size: 1.0625rem;
-      font-weight: 600;
-      margin-bottom: var(--space-2);
-    }
+    .feature-card h3 { font-size: 1.0625rem; font-weight: 600; margin-bottom: var(--space-2); }
     .feature-card p { font-size: 0.875rem; color: var(--muted-light); line-height: 1.6; }
 
-    /* ---- Stats section ---- */
-    .stats-row {
+    /* Two-col layout for sections */
+    .section-split {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--space-1);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      overflow: hidden;
-      margin: var(--space-16) 0;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(32px, 6vw, 80px);
+      align-items: center;
     }
-    .stat-item {
-      padding: var(--space-10) var(--space-8);
-      text-align: center;
-      border-right: 1px solid var(--border);
-      position: relative;
-    }
-    .stat-item:last-child { border-right: none; }
-    .stat-item::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at center, rgba(124,58,237,0.06), transparent 70%);
-      pointer-events: none;
-    }
-    .stat-num {
-      font-family: var(--font-display);
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      font-weight: 700;
-      background: var(--grad-hero);
-      background-size: 200% 200%;
-      animation: gradientShift 5s ease infinite;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      display: block;
-      line-height: 1;
-    }
-    .stat-label { font-size: 0.9375rem; color: var(--muted-light); margin-top: var(--space-2); }
-
-    /* Demo cards in section 2 */
-    .demo-squad-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: var(--space-5);
-      transform: translateX(-60px);
-      opacity: 0;
-      transition: transform 0.6s var(--ease-spring), opacity 0.6s ease;
-    }
-    .demo-squad-card.visible {
-      transform: translateX(0);
-      opacity: 1;
-    }
-    .demo-product-card {
-      transform: translateX(60px);
-      opacity: 0;
-      transition: transform 0.6s var(--ease-spring) 0.1s, opacity 0.6s ease 0.1s;
-    }
-    .demo-product-card.visible {
-      transform: translateX(0);
-      opacity: 1;
+    @media (max-width: 768px) {
+      .section-split { grid-template-columns: 1fr; }
+      .section-split .demo-right { order: -1; }
     }
 
-    /* ---- CTA section ---- */
+    /* Demo cards */
+    .demo-squad-card  { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-5); }
+    .demo-product-card { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+    @media (max-width: 480px) {
+      .demo-product-card { grid-template-columns: 1fr; }
+    }
+
+    /* Comparison table */
+    .compare-table { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-5); }
+
+    /* CTA */
     .cta-section {
       text-align: center;
-      padding: var(--space-24) var(--space-6);
+      padding: clamp(48px, 10vw, 96px) var(--space-5);
       position: relative;
       z-index: 2;
     }
     .cta-glow {
-      position: absolute;
-      top: 50%;
-      left: 50%;
+      position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
-      pointer-events: none;
-      border-radius: 50%;
+      width: min(600px, 100vw);
+      height: min(600px, 100vw);
+      background: radial-gradient(circle, rgba(124,58,237,0.18) 0%, transparent 70%);
+      pointer-events: none; border-radius: 50%;
     }
+    .cta-section h2 { font-size: clamp(2rem, 5vw, 4rem); }
 
-    /* ---- Footer ---- */
+    /* Footer */
     .footer {
-      position: relative;
-      z-index: 2;
+      position: relative; z-index: 2;
       border-top: 1px solid var(--border);
-      padding: var(--space-10) 0;
-      text-align: center;
+      padding: var(--space-8) 0;
     }
-    .footer-content {
+    .footer-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: var(--space-6);
+      gap: var(--space-5);
       flex-wrap: wrap;
     }
     .footer-logo {
@@ -348,303 +344,241 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .footer-links {
-      display: flex;
-      gap: var(--space-6);
-    }
-    .footer-links a {
-      font-size: 0.875rem;
-      color: var(--muted-light);
-      transition: color var(--trans-fast);
-    }
+    .footer-links { display: flex; gap: var(--space-5); flex-wrap: wrap; }
+    .footer-links a { font-size: 0.875rem; color: var(--muted-light); transition: color var(--trans-fast); }
     .footer-links a:hover { color: var(--text); }
-    .footer-copy { font-size: 0.8125rem; color: var(--muted); }
+    .footer-copy { font-size: 0.8rem; color: var(--muted); }
+    @media (max-width: 480px) {
+      .footer-inner { flex-direction: column; text-align: center; }
+      .footer-links { justify-content: center; }
+    }
 
-    @media (max-width: 768px) {
-      .feature-grid { grid-template-columns: 1fr; }
-      .stats-row { grid-template-columns: 1fr; }
-      .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
-      .stat-item:last-child { border-bottom: none; }
-      .hero-actions { flex-direction: column; align-items: stretch; }
-      .hero-actions .btn { justify-content: center; }
-      .footer-content { flex-direction: column; text-align: center; }
+    /* Checklist items */
+    .check-list { display: flex; flex-direction: column; gap: var(--space-4); margin-top: var(--space-6); }
+    .check-item { display: flex; align-items: flex-start; gap: var(--space-3); font-size: 0.9375rem; color: var(--text-secondary); }
+    .check-icon {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(124,58,237,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; flex-shrink: 0; margin-top: 1px;
+      color: var(--purple-light);
     }
   </style>
 </head>
 <body class="landing-page">
 
-  <!-- Three.js Canvas -->
-  <canvas id="bg-canvas"></canvas>
+<canvas id="bg-canvas"></canvas>
 
-  <!-- HERO SECTION -->
-  <section class="hero" id="hero">
-    <!-- Floating chips (decorative) -->
-    <div class="hero-floating-chips" aria-hidden="true">
-      <span class="floating-chip" style="top:15%;left:8%;--dur:7s;--delay:-2s">⚡ Ship Fast</span>
-      <span class="floating-chip" style="top:25%;right:10%;--dur:8s;--delay:-4s">💰 Gumroad</span>
-      <span class="floating-chip" style="top:65%;left:6%;--dur:9s;--delay:-1s">🤖 Automation</span>
-      <span class="floating-chip" style="top:70%;right:8%;--dur:7.5s;--delay:-3s">👥 Squad</span>
-      <span class="floating-chip" style="top:40%;left:3%;--dur:6s;--delay:-5s">🔥 +$240 today</span>
-      <span class="floating-chip" style="top:50%;right:4%;--dur:8.5s;--delay:-2.5s">📋 Template</span>
+<!-- ===== HERO ===== -->
+<section class="hero" id="hero">
+  <div class="hero-chips" aria-hidden="true">
+    <span class="floating-chip" style="top:18%;left:7%;--dur:7s;--delay:-2s">⚡ Ship Fast</span>
+    <span class="floating-chip" style="top:28%;right:8%;--dur:8s;--delay:-4s">💰 Gumroad</span>
+    <span class="floating-chip" style="top:62%;left:5%;--dur:9s;--delay:-1s">🤖 Automation</span>
+    <span class="floating-chip" style="top:68%;right:7%;--dur:7.5s;--delay:-3s">👥 Squad</span>
+    <span class="floating-chip" style="top:42%;left:2%;--dur:6s;--delay:-5s">🔥 +$240 today</span>
+    <span class="floating-chip" style="top:48%;right:3%;--dur:8.5s;--delay:-2.5s">📋 Template</span>
+  </div>
+
+  <div class="hero-eyebrow">New era of builder culture</div>
+
+  <h1 class="hero-title" aria-label="KREW">
+    <span class="char" style="animation-delay:0.05s">K</span><span class="char" style="animation-delay:0.12s">R</span><span class="char" style="animation-delay:0.19s">E</span><span class="char grad-char" style="animation-delay:0.26s">W</span>
+  </h1>
+
+  <p class="hero-subtitle">
+    Join a <strong style="color:var(--cyan)">squad</strong> in minutes. Ship in weeks.
+    Sell your scripts &amp; automations — keep <strong style="color:var(--pink-light)">100% profit</strong>.
+    Zero cuts. Always free.
+  </p>
+
+  <div class="hero-actions">
+    <a href="/explore" class="btn btn-primary btn-xl animate-glow-pulse">Start Building →</a>
+    <a href="/marketplace" class="btn btn-secondary btn-xl">Marketplace</a>
+  </div>
+
+  <div class="scroll-cue" onclick="document.getElementById('section-how').scrollIntoView({behavior:'smooth'})">
+    <span>Scroll</span>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 5v14M5 12l7 7 7-7"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ===== STATS ===== -->
+<div class="container" style="position:relative;z-index:2">
+  <div class="stats-row" id="stats-row">
+    <div class="stat-item">
+      <span class="stat-num" id="stat-squads">0</span>
+      <div class="stat-label">Active Squads</div>
     </div>
-
-    <div class="hero-eyebrow">New era of builder culture</div>
-
-    <h1 class="hero-title" id="hero-title" aria-label="KREW">
-      <span class="char" style="--i:0;animation-delay:0.05s">K</span><span class="char" style="animation-delay:0.12s">R</span><span class="char" style="animation-delay:0.19s">E</span><span class="char gradient-word" style="--i:3;animation-delay:0.26s">W</span>
-    </h1>
-
-    <p class="hero-subtitle" id="hero-subtitle">
-      Join a <strong style="color:var(--cyan)">squad</strong> in minutes. Ship in weeks.
-      Sell your scripts &amp; automations — keep <strong style="color:var(--pink-light)">100% profit</strong>.
-      Zero platform cut. Always free.
-    </p>
-
-    <div class="hero-actions">
-      <a href="/explore" class="btn btn-primary btn-xl animate-glow-pulse">
-        Start Building →
-      </a>
-      <a href="/marketplace" class="btn btn-secondary btn-xl">
-        Browse Marketplace
-      </a>
+    <div class="stat-item">
+      <span class="stat-num" id="stat-products">0</span>
+      <div class="stat-label">Products for Sale</div>
     </div>
-
-    <div class="scroll-cue" id="scroll-cue" onclick="document.getElementById('section-how').scrollIntoView({behavior:'smooth'})">
-      <span>Scroll</span>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 5v14M5 12l7 7 7-7"/>
-      </svg>
+    <div class="stat-item">
+      <span class="stat-num" id="stat-builders">0</span>
+      <div class="stat-label">Builders Joined</div>
     </div>
-  </section>
+  </div>
+</div>
 
-  <!-- STATS -->
-  <div class="container" style="position:relative;z-index:2">
-    <div class="stats-row" id="stats-row">
-      <div class="stat-item">
-        <span class="stat-num" id="stat-squads" data-target="0">0</span>
-        <div class="stat-label">Active Squads</div>
+<!-- ===== HOW IT WORKS ===== -->
+<section class="landing-section" id="section-how">
+  <div class="container">
+    <div class="text-center" style="margin-bottom:clamp(24px,5vw,48px)">
+      <div class="section-label">How it works</div>
+      <h2 class="section-heading">Three moves to <span class="text-gradient">make money</span></h2>
+      <p class="section-desc" style="margin:0 auto">No long-term commitments, no fees, no complex setup. Just build, ship, earn.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">👥</div>
+        <h3>1. Join a Squad</h3>
+        <p>Browse open squads matching your skills. Commit to a 1–8 week sprint. Your profile shows squads, not employers.</p>
       </div>
-      <div class="stat-item">
-        <span class="stat-num" id="stat-products" data-target="0">0</span>
-        <div class="stat-label">Products for Sale</div>
+      <div class="feature-card">
+        <div class="feature-icon">🚀</div>
+        <h3>2. Build &amp; Ship</h3>
+        <p>Collaborate, track progress, post updates. No bureaucracy — just a small crew building something real, fast.</p>
       </div>
-      <div class="stat-item">
-        <span class="stat-num" id="stat-builders" data-target="0">0</span>
-        <div class="stat-label">Builders Joined</div>
+      <div class="feature-card">
+        <div class="feature-icon">💸</div>
+        <h3>3. Sell Your Work</h3>
+        <p>Upload scripts, automations, and templates. Paste your Gumroad link — every sale is 100% yours. Zero cut.</p>
       </div>
     </div>
   </div>
+</section>
 
-  <!-- HOW IT WORKS -->
-  <section class="landing-section" id="section-how">
-    <div class="container">
-      <div class="text-center" style="margin-bottom:var(--space-12)">
-        <div class="section-label">How it works</div>
-        <h2 class="section-heading">
-          Three moves to <span class="text-gradient">make money</span>
-        </h2>
-        <p class="section-desc" style="margin:0 auto">
-          No long-term commitments, no platform fees, no complex setup. Just build, ship, earn.
-        </p>
+<!-- ===== SQUADS SECTION ===== -->
+<section class="landing-section" id="section-squads" style="background:linear-gradient(to right,rgba(124,58,237,0.05),transparent)">
+  <div class="container">
+    <div class="section-split">
+      <div>
+        <div class="section-label">Squads</div>
+        <h2 class="section-heading">Your resume is <span class="text-gradient">what you shipped</span></h2>
+        <p class="section-desc">Forget "5 years at BigCorp". On Krew, your profile shows every squad you joined, what you built, and who you built it with.</p>
+        <div class="check-list">
+          <div class="check-item"><span class="check-icon">✓</span><span>Post a squad with skills needed, duration, and payout model</span></div>
+          <div class="check-item"><span class="check-icon">✓</span><span>Members join, you collaborate, ship in weeks not years</span></div>
+          <div class="check-item"><span class="check-icon">✓</span><span>Squad appears forever on everyone's profile as proof of work</span></div>
+        </div>
+        <a href="/squads" class="btn btn-outline btn-lg" style="margin-top:var(--space-8)">Browse Open Squads →</a>
       </div>
 
-      <div class="feature-grid">
-        <div class="feature-card">
-          <div class="feature-icon">👥</div>
-          <h3>1. Join a Squad</h3>
-          <p>Browse open squads looking for your exact skill set. Commit to a 1–8 week sprint. Your profile shows squads, not past employers.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🚀</div>
-          <h3>2. Build & Ship</h3>
-          <p>Collaborate in your squad, track progress, post updates. No bureaucracy — just a small crew building something real.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">💸</div>
-          <h3>3. Sell Your Work</h3>
-          <p>Upload your scripts, automations, and templates to the marketplace. Paste your Gumroad link — you keep 100% of sales.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SQUADS SECTION -->
-  <section class="landing-section" id="section-squads" style="background:linear-gradient(to right,rgba(124,58,237,0.04),transparent)">
-    <div class="container">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-16);align-items:center">
-        <div>
-          <div class="section-label">Squads</div>
-          <h2 class="section-heading">Your resume is <span class="text-gradient">what you shipped</span></h2>
-          <p class="section-desc">
-            Forget "5 years at BigCorp". On Krew, your profile shows every squad you joined, what you built, and who you built it with. Short-term, high-output, real results.
-          </p>
-          <div style="display:flex;flex-direction:column;gap:var(--space-4);margin-top:var(--space-8)">
-            <div style="display:flex;align-items:center;gap:var(--space-3)">
-              <span style="width:32px;height:32px;border-radius:50%;background:var(--purple-dim);border:1px solid var(--purple);display:flex;align-items:center;justify-content:center;font-size:0.875rem;flex-shrink:0">✓</span>
-              <span style="font-size:0.9375rem;color:var(--text-secondary)">Post a squad with skills needed, duration, and payout model</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:var(--space-3)">
-              <span style="width:32px;height:32px;border-radius:50%;background:var(--purple-dim);border:1px solid var(--purple);display:flex;align-items:center;justify-content:center;font-size:0.875rem;flex-shrink:0">✓</span>
-              <span style="font-size:0.9375rem;color:var(--text-secondary)">Members join, you collaborate, ship in weeks</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:var(--space-3)">
-              <span style="width:32px;height:32px;border-radius:50%;background:var(--purple-dim);border:1px solid var(--purple);display:flex;align-items:center;justify-content:center;font-size:0.875rem;flex-shrink:0">✓</span>
-              <span style="font-size:0.9375rem;color:var(--text-secondary)">Squad appears forever on everyone's profile</span>
-            </div>
+      <div style="display:flex;flex-direction:column;gap:var(--space-4)" class="demo-right">
+        <div class="demo-squad-card card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+            <span class="badge badge-open">Open</span>
+            <span class="category-chip">2 weeks</span>
           </div>
-          <a href="/squads" class="btn btn-outline btn-lg" style="margin-top:var(--space-8)">Browse Open Squads →</a>
+          <h4 style="font-size:1rem;margin-bottom:6px">AI SaaS landing page generator</h4>
+          <p style="font-size:0.8rem;color:var(--muted-light);margin-bottom:12px">React dev + copywriter to build a side project that generates landing pages from URLs.</p>
+          <div class="tags"><span class="tag">React</span><span class="tag">OpenAI</span><span class="tag cyan">Revenue Split</span></div>
         </div>
-
-        <div style="display:flex;flex-direction:column;gap:var(--space-4)" id="demo-squads">
-          <!-- Demo squad cards (static for landing) -->
-          <div class="card demo-squad-card" id="demo-sq-1">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
-              <span class="badge badge-open">Open</span>
-              <span class="category-chip">2 weeks</span>
-            </div>
-            <h4 style="font-size:1rem;margin-bottom:6px">AI SaaS landing page generator</h4>
-            <p style="font-size:0.8rem;color:var(--muted-light);margin-bottom:12px">Need a React dev + copywriter to build a side project that generates landing pages from URLs.</p>
-            <div class="tags">
-              <span class="tag">React</span>
-              <span class="tag">OpenAI</span>
-              <span class="tag cyan">Revenue Split</span>
-            </div>
+        <div class="demo-squad-card card" style="margin-left:clamp(0px,4vw,32px)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+            <span class="badge badge-open">Open</span>
+            <span class="category-chip">1 month</span>
           </div>
-
-          <div class="card demo-squad-card" id="demo-sq-2" style="margin-left:32px">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
-              <span class="badge badge-open">Open</span>
-              <span class="category-chip">1 month</span>
-            </div>
-            <h4 style="font-size:1rem;margin-bottom:6px">Chrome extension for LinkedIn automation</h4>
-            <p style="font-size:0.8rem;color:var(--muted-light);margin-bottom:12px">Solo dev needed. Already have the idea, domain, and distribution. Split 50/50.</p>
-            <div class="tags">
-              <span class="tag">JavaScript</span>
-              <span class="tag">Chrome API</span>
-              <span class="tag pink">50/50 Split</span>
-            </div>
-          </div>
+          <h4 style="font-size:1rem;margin-bottom:6px">Chrome extension for LinkedIn automation</h4>
+          <p style="font-size:0.8rem;color:var(--muted-light);margin-bottom:12px">Solo dev needed. Already have the idea, domain, and distribution. Split 50/50.</p>
+          <div class="tags"><span class="tag">JavaScript</span><span class="tag pink">50/50 Split</span></div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- MARKETPLACE SECTION -->
-  <section class="landing-section" id="section-marketplace">
-    <div class="container">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-16);align-items:center">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)" id="demo-products">
-          <div class="card product-card demo-product-card" id="demo-p-1">
-            <div class="preview" style="background:linear-gradient(135deg,#7C3AED22,#06B6D422);height:120px;display:flex;align-items:center;justify-content:center;font-size:2rem;border-radius:var(--radius) var(--radius) 0 0">⚡</div>
-            <div class="card-body">
-              <span class="category-chip">Script</span>
-              <div class="card-title" style="margin-top:8px">LinkedIn Auto Connect</div>
-              <div class="card-footer" style="margin-top:10px"><span class="price">$19</span></div>
-            </div>
+<!-- ===== MARKETPLACE SECTION ===== -->
+<section class="landing-section" id="section-marketplace">
+  <div class="container">
+    <div class="section-split">
+      <!-- Product demo cards -->
+      <div class="demo-right">
+        <div class="demo-product-card">
+          <div class="demo-squad-card card" style="padding:0;overflow:hidden">
+            <div style="height:90px;background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(6,182,212,0.2));display:flex;align-items:center;justify-content:center;font-size:2rem">⚡</div>
+            <div style="padding:14px"><span class="category-chip" style="font-size:0.6rem">Script</span><div style="font-size:0.875rem;font-weight:600;margin:8px 0 4px">LinkedIn Auto Connect</div><span style="font-family:var(--font-display);font-weight:700">$19</span></div>
           </div>
-          <div class="card product-card demo-product-card" id="demo-p-2" style="margin-top:24px">
-            <div class="preview" style="background:linear-gradient(135deg,#EC489922,#7C3AED22);height:120px;display:flex;align-items:center;justify-content:center;font-size:2rem;border-radius:var(--radius) var(--radius) 0 0">🤖</div>
-            <div class="card-body">
-              <span class="category-chip">Automation</span>
-              <div class="card-title" style="margin-top:8px">n8n Email Workflow</div>
-              <div class="card-footer" style="margin-top:10px"><span class="price">$39</span></div>
-            </div>
+          <div class="demo-squad-card card" style="padding:0;overflow:hidden;margin-top:clamp(12px,3vw,24px)">
+            <div style="height:90px;background:linear-gradient(135deg,rgba(236,72,153,0.3),rgba(124,58,237,0.2));display:flex;align-items:center;justify-content:center;font-size:2rem">🤖</div>
+            <div style="padding:14px"><span class="category-chip" style="font-size:0.6rem">Automation</span><div style="font-size:0.875rem;font-weight:600;margin:8px 0 4px">n8n Email Flow</div><span style="font-family:var(--font-display);font-weight:700">$39</span></div>
           </div>
-          <div class="card product-card demo-product-card" id="demo-p-3">
-            <div class="preview" style="background:linear-gradient(135deg,#06B6D422,#10B98122);height:120px;display:flex;align-items:center;justify-content:center;font-size:2rem;border-radius:var(--radius) var(--radius) 0 0">📋</div>
-            <div class="card-body">
-              <span class="category-chip">Template</span>
-              <div class="card-title" style="margin-top:8px">Next.js SaaS Boilerplate</div>
-              <div class="card-footer" style="margin-top:10px"><span class="price">$49</span></div>
-            </div>
+          <div class="demo-squad-card card" style="padding:0;overflow:hidden">
+            <div style="height:90px;background:linear-gradient(135deg,rgba(6,182,212,0.3),rgba(16,185,129,0.2));display:flex;align-items:center;justify-content:center;font-size:2rem">📋</div>
+            <div style="padding:14px"><span class="category-chip" style="font-size:0.6rem">Template</span><div style="font-size:0.875rem;font-weight:600;margin:8px 0 4px">Next.js SaaS Kit</div><span style="font-family:var(--font-display);font-weight:700">$49</span></div>
           </div>
-          <div class="card product-card demo-product-card" id="demo-p-4" style="margin-top:24px">
-            <div class="preview" style="background:linear-gradient(135deg,#F59E0B22,#EC489922);height:120px;display:flex;align-items:center;justify-content:center;font-size:2rem;border-radius:var(--radius) var(--radius) 0 0">🎨</div>
-            <div class="card-body">
-              <span class="category-chip" style="background:rgba(245,158,11,0.1);color:var(--orange);border-color:rgba(245,158,11,0.2)">Design</span>
-              <div class="card-title" style="margin-top:8px">Figma Dashboard Kit</div>
-              <div class="card-footer" style="margin-top:10px"><span class="price" style="color:var(--green)">Free</span></div>
-            </div>
+          <div class="demo-squad-card card" style="padding:0;overflow:hidden;margin-top:clamp(12px,3vw,24px)">
+            <div style="height:90px;background:linear-gradient(135deg,rgba(245,158,11,0.3),rgba(236,72,153,0.2));display:flex;align-items:center;justify-content:center;font-size:2rem">🎨</div>
+            <div style="padding:14px"><span class="category-chip" style="font-size:0.6rem;background:rgba(16,185,129,0.1);color:var(--green);border-color:rgba(16,185,129,0.2)">Design</span><div style="font-size:0.875rem;font-weight:600;margin:8px 0 4px">Figma Dashboard Kit</div><span style="font-family:var(--font-display);font-weight:700;color:var(--green)">Free</span></div>
           </div>
-        </div>
-
-        <div>
-          <div class="section-label">Marketplace</div>
-          <h2 class="section-heading">Sell once, <span class="text-gradient">earn forever</span></h2>
-          <p class="section-desc">Upload a script you built, paste your Gumroad link, and every sale is 100% yours. We never charge a cut.</p>
-          <div style="margin-top:var(--space-8);padding:var(--space-5);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
-            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted-light);margin-bottom:var(--space-4)">Compare platforms</div>
-            <div style="display:flex;flex-direction:column;gap:var(--space-3)">
-              <div style="display:flex;justify-content:space-between;font-size:0.875rem">
-                <span>Krew cut</span>
-                <span style="color:var(--green);font-weight:700">0%</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;font-size:0.875rem;color:var(--muted-light)">
-                <span>Gumroad cut</span><span>10%</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;font-size:0.875rem;color:var(--muted-light)">
-                <span>Fiverr cut</span><span>20%</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;font-size:0.875rem;color:var(--muted-light)">
-                <span>Upwork cut</span><span>20%</span>
-              </div>
-            </div>
-          </div>
-          <a href="/marketplace" class="btn btn-cyan btn-lg" style="margin-top:var(--space-8)">
-            Browse Marketplace →
-          </a>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- CTA SECTION -->
-  <section class="cta-section" id="section-cta">
-    <div class="cta-glow"></div>
-    <div class="container" style="position:relative;z-index:1">
-      <h2 class="section-heading" style="font-size:clamp(2.5rem,5vw,4rem);margin-bottom:var(--space-5)">
-        Ready to <span class="text-gradient">Krew up?</span>
-      </h2>
-      <p style="font-size:1.125rem;color:var(--muted-light);max-width:480px;margin:0 auto var(--space-10)">
-        Join thousands of builders creating, shipping, and earning on their own terms.
-      </p>
-      <a href="/login?mode=signup" class="btn btn-primary btn-xl animate-glow-pulse" id="cta-btn" style="font-size:1.125rem;padding:18px 48px">
-        Create Free Account →
-      </a>
-      <p style="margin-top:var(--space-4);font-size:0.8125rem;color:var(--muted)">
-        No credit card. No subscriptions. Free forever.
-      </p>
-    </div>
-  </section>
+      <div>
+        <div class="section-label">Marketplace</div>
+        <h2 class="section-heading">Sell once, <span class="text-gradient">earn forever</span></h2>
+        <p class="section-desc">Upload a script you built, paste your Gumroad link, and every sale is 100% yours. We never take a cut.</p>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-logo">KREW</div>
-        <div class="footer-links">
-          <a href="/explore">Explore</a>
-          <a href="/squads">Squads</a>
-          <a href="/marketplace">Marketplace</a>
+        <div class="compare-table" style="margin-top:var(--space-6)">
+          <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted-light);margin-bottom:var(--space-3)">Platform comparison</div>
+          <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+            <div style="display:flex;justify-content:space-between;font-size:0.875rem;font-weight:700"><span>Krew platform fee</span><span style="color:var(--green)">0%</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:0.875rem;color:var(--muted-light)"><span>Gumroad</span><span>10%</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:0.875rem;color:var(--muted-light)"><span>Fiverr</span><span>20%</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:0.875rem;color:var(--muted-light)"><span>Upwork</span><span>20%</span></div>
+          </div>
         </div>
-        <div class="footer-copy">© 2025 Krew. Built for builders.</div>
+        <a href="/marketplace" class="btn btn-cyan btn-lg" style="margin-top:var(--space-6)">Browse Marketplace →</a>
       </div>
     </div>
-  </footer>
+  </div>
+</section>
 
-  <!-- Supabase CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <!-- GSAP -->
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<!-- ===== CTA ===== -->
+<section class="cta-section" id="section-cta">
+  <div class="cta-glow"></div>
+  <div class="container" style="position:relative;z-index:1">
+    <h2 class="section-heading" style="margin-bottom:var(--space-4)">Ready to <span class="text-gradient">Krew up?</span></h2>
+    <p style="font-size:clamp(0.9rem,2vw,1.125rem);color:var(--muted-light);max-width:440px;margin:0 auto var(--space-8)">
+      Join thousands of builders creating, shipping, and earning on their own terms.
+    </p>
+    <a href="/login?mode=signup" class="btn btn-primary btn-xl animate-glow-pulse" id="cta-btn" style="font-size:1rem;padding:16px 40px">
+      Create Free Account →
+    </a>
+    <p style="margin-top:var(--space-4);font-size:0.8rem;color:var(--muted)">No credit card. No subscriptions. Free forever.</p>
+  </div>
+</section>
 
-  <!-- Landing JS (Three.js + GSAP scenes) -->
-  <script type="module" src="/js/landing.js"></script>
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">KREW</div>
+      <div class="footer-links">
+        <a href="/explore">Explore</a>
+        <a href="/squads">Squads</a>
+        <a href="/marketplace">Marketplace</a>
+      </div>
+      <div class="footer-copy">© 2025 Krew. Built for builders.</div>
+    </div>
+  </div>
+</footer>
 
-  <!-- Nav -->
-  <script type="module">
-    import { initNav } from '/js/nav.js';
-    initNav('home');
-  </script>
+<!-- Supabase (UMD, needed by db.js) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<!-- GSAP -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<!-- Landing (Three.js + physics) -->
+<script type="module" src="/js/landing.js"></script>
+<!-- Nav -->
+<script type="module">
+  import { initNav } from '/js/nav.js';
+  initNav('home');
+</script>
 </body>
 </html>

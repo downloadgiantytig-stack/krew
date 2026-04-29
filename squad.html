@@ -11,6 +11,29 @@
   <link rel="stylesheet" href="/css/animations.css">
   <link rel="stylesheet" href="/css/components.css">
   <link rel="stylesheet" href="/css/layout.css">
+  <style>
+    /* Keep post-toggle responsive */
+    .updates-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      margin-bottom: var(--space-5);
+      flex-wrap: wrap;
+    }
+    .updates-header h2 { font-size: 1.125rem; font-weight: 600; }
+
+    /* Meta rows: don't overflow on narrow screens */
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .meta-row span:first-child { color: var(--muted-light); }
+    .meta-row span:last-child  { font-weight: 500; text-align: right; }
+  </style>
 </head>
 <body>
 <main class="page-content">
@@ -28,30 +51,28 @@
       <div class="detail-layout">
         <!-- Main content -->
         <div>
-          <div style="display:flex;align-items:flex-start;gap:var(--space-5);margin-bottom:var(--space-6);flex-wrap:wrap">
-            <div style="flex:1">
-              <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-4);flex-wrap:wrap">
-                <span id="sq-status-badge" class="badge badge-open">Open</span>
-                <span id="sq-duration-chip" class="category-chip hidden"></span>
-                <span id="sq-payout-chip" class="tag green hidden"></span>
-              </div>
-              <h1 id="sq-title" style="font-size:clamp(1.5rem,3vw,2.25rem);font-weight:700;margin-bottom:var(--space-4);font-family:var(--font-display)"></h1>
-              <p id="sq-desc" style="font-size:1.0625rem;color:var(--muted-light);line-height:1.7;margin-bottom:var(--space-6)"></p>
-              <div id="sq-tags" class="tags" style="margin-bottom:var(--space-6)"></div>
+          <div style="margin-bottom:var(--space-6)">
+            <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-4);flex-wrap:wrap">
+              <span id="sq-status-badge" class="badge badge-open">Open</span>
+              <span id="sq-duration-chip" class="category-chip hidden"></span>
+              <span id="sq-payout-chip" class="tag green hidden"></span>
             </div>
+            <h1 id="sq-title" style="font-size:clamp(1.5rem,3vw,2.25rem);font-weight:700;margin-bottom:var(--space-4);font-family:var(--font-display)"></h1>
+            <p id="sq-desc" style="font-size:1.0625rem;color:var(--muted-light);line-height:1.7;margin-bottom:var(--space-6)"></p>
+            <div id="sq-tags" class="tags" style="margin-bottom:var(--space-6)"></div>
           </div>
 
           <!-- Posts / Updates -->
           <div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-5)">
-              <h2 style="font-size:1.125rem;font-weight:600">Squad Updates</h2>
+            <div class="updates-header">
+              <h2>Squad Updates</h2>
               <button class="btn btn-secondary btn-sm" id="post-toggle" onclick="togglePostForm()">+ Post Update</button>
             </div>
 
             <!-- Post form (hidden by default) -->
             <div id="post-form" class="card hidden" style="margin-bottom:var(--space-5)">
               <textarea class="input" id="post-content" placeholder="Share an update, ask a question, or post a quick win…" rows="3" style="margin-bottom:var(--space-3)"></textarea>
-              <div style="display:flex;gap:var(--space-3);justify-content:flex-end">
+              <div style="display:flex;gap:var(--space-3);justify-content:flex-end;flex-wrap:wrap">
                 <button class="btn btn-ghost btn-sm" onclick="togglePostForm()">Cancel</button>
                 <button class="btn btn-primary btn-sm" onclick="submitPost()">Post →</button>
               </div>
@@ -139,7 +160,7 @@
     if (squad.payout_model) rows.push(['💰 Payout', squad.payout_model]);
     if (squad.max_members)  rows.push(['👥 Max members', squad.max_members]);
     rows.push(['📅 Created', new Date(squad.created_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})]);
-    return rows.map(([k,v])=>`<div style="display:flex;justify-content:space-between;font-size:0.875rem"><span style="color:var(--muted-light)">${esc(k)}</span><span style="font-weight:500">${esc(v)}</span></div>`).join('');
+    return rows.map(([k,v])=>`<div class="meta-row"><span>${esc(k)}</span><span>${esc(v)}</span></div>`).join('');
   }
 
   function renderPost(post) {
@@ -150,7 +171,7 @@
       <div class="card" style="padding:var(--space-5)">
         <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-4)">
           ${avatarEl(a,'avatar-sm')}
-          <div>
+          <div style="min-width:0">
             <a href="/profile?u=${esc(a.username)}" style="font-size:0.875rem;font-weight:600;color:var(--text)">${esc(a.username)}</a>
             <div style="font-size:0.75rem;color:var(--muted)">${timeAgo(post.created_at)}</div>
           </div>
@@ -168,7 +189,7 @@
 
       document.title = `${squadData.name} — Krew`;
 
-      const statusMap = { open:'badge-open', in_progress:'badge-progress', completed:'badge-closed' };
+      const statusMap   = { open:'badge-open', in_progress:'badge-progress', completed:'badge-closed' };
       const statusLabel = { open:'Open', in_progress:'In Progress', completed:'Completed' };
 
       document.getElementById('sq-title').textContent           = squadData.name;
@@ -183,15 +204,14 @@
       if (squadData.payout_model) { payChip.textContent='💰 '+squadData.payout_model; payChip.classList.remove('hidden'); }
 
       // Tags
-      const tagsEl = document.getElementById('sq-tags');
-      tagsEl.innerHTML = (squadData.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
+      document.getElementById('sq-tags').innerHTML = (squadData.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
 
       // Creator
       const cr = squadData.creator||{};
       document.getElementById('sq-creator').innerHTML = `
         ${avatarEl(cr, 'avatar-lg')}
-        <div>
-          <a href="/profile?u=${esc(cr.username)}" style="font-weight:600;color:var(--text);font-size:0.9375rem">${esc(cr.full_name||cr.username)}</a>
+        <div style="min-width:0">
+          <a href="/profile?u=${esc(cr.username)}" style="font-weight:600;color:var(--text);font-size:0.9375rem;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(cr.full_name||cr.username)}</a>
           <div style="font-size:0.8rem;color:var(--muted-light)">@${esc(cr.username)}</div>
         </div>
       `;
@@ -206,9 +226,9 @@
         return `
           <div style="display:flex;align-items:center;gap:var(--space-3)">
             ${avatarEl(u,'avatar-sm')}
-            <div style="flex:1">
-              <a href="/profile?u=${esc(u.username)}" style="font-size:0.875rem;font-weight:500;color:var(--text)">${esc(u.full_name||u.username||'?')}</a>
-              ${m.role==='owner'?`<span style="font-size:0.7rem;color:var(--purple-light);margin-left:4px">★ owner</span>`:''}
+            <div style="flex:1;min-width:0">
+              <a href="/profile?u=${esc(u.username)}" style="font-size:0.875rem;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block">${esc(u.full_name||u.username||'?')}</a>
+              ${m.role==='owner'?`<span style="font-size:0.7rem;color:var(--purple-light)">★ owner</span>`:''}
             </div>
           </div>
         `;
@@ -249,7 +269,6 @@
     }
     loginHint.style.display = 'none';
 
-    // Check if creator (don't show join/leave)
     if (squadData.creator_id === user.id) {
       joinBtn.style.display  = 'none';
       leaveBtn.style.display = 'none';
@@ -272,7 +291,7 @@
       document.getElementById('join-btn').style.display = 'none';
       document.getElementById('leave-btn').style.display = '';
       showToast('Joined the squad! 🚀', 'success');
-      loadSquad(); // refresh member count
+      loadSquad();
     } catch(err) { showToast(err.message,'error'); }
     finally { btn.disabled=false; }
   };

@@ -11,6 +11,27 @@
   <link rel="stylesheet" href="/css/animations.css">
   <link rel="stylesheet" href="/css/components.css">
   <link rel="stylesheet" href="/css/layout.css">
+  <style>
+    /* Product meta rows */
+    .prod-stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .prod-stat-row span:first-child { color: var(--muted-light); }
+    .prod-stat-row span:last-child  { font-weight: 500; text-align: right; }
+
+    /* Demo card responsive */
+    .demo-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+  </style>
 </head>
 <body>
 <main class="page-content">
@@ -46,12 +67,14 @@
           </div>
 
           <!-- Demo link -->
-          <div id="prod-demo-wrap" class="hidden card" style="margin-bottom:var(--space-6);display:flex;align-items:center;justify-content:space-between">
-            <div>
-              <div style="font-weight:600;margin-bottom:4px">Live Demo</div>
-              <div style="font-size:0.8375rem;color:var(--muted-light)">Try it before you buy</div>
+          <div id="prod-demo-wrap" class="hidden card" style="margin-bottom:var(--space-6)">
+            <div class="demo-card">
+              <div>
+                <div style="font-weight:600;margin-bottom:4px">Live Demo</div>
+                <div style="font-size:0.8375rem;color:var(--muted-light)">Try it before you buy</div>
+              </div>
+              <a id="prod-demo-link" href="#" target="_blank" rel="noopener" class="btn btn-secondary">View Demo ↗</a>
             </div>
-            <a id="prod-demo-link" href="#" target="_blank" rel="noopener" class="btn btn-secondary">View Demo ↗</a>
           </div>
         </div>
 
@@ -59,7 +82,7 @@
         <div class="sidebar">
           <!-- Buy card -->
           <div class="card" style="text-align:center;border-color:var(--border-strong)">
-            <div id="prod-price" style="font-family:var(--font-display);font-size:2.5rem;font-weight:700;margin-bottom:var(--space-2)"></div>
+            <div id="prod-price" style="font-family:var(--font-display);font-size:clamp(1.75rem,5vw,2.5rem);font-weight:700;margin-bottom:var(--space-2)"></div>
             <div style="font-size:0.8125rem;color:var(--muted-light);margin-bottom:var(--space-6)">one-time payment</div>
             <a id="prod-buy-btn" href="#" target="_blank" rel="noopener" class="btn btn-primary btn-xl animate-glow-pulse w-full" style="justify-content:center;margin-bottom:var(--space-3)">Buy Now ↗</a>
             <p style="font-size:0.75rem;color:var(--muted)">Powered by <span id="prod-checkout-label">Gumroad</span>. Secure checkout.</p>
@@ -141,14 +164,12 @@
       document.getElementById('prod-desc').textContent  = p.description || '';
 
       // Tags
-      const tagsEl = document.getElementById('prod-tags');
-      tagsEl.innerHTML = (p.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
+      document.getElementById('prod-tags').innerHTML = (p.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
 
       // Demo link
       if (p.demo_url) {
         const demoWrap = document.getElementById('prod-demo-wrap');
         demoWrap.classList.remove('hidden');
-        demoWrap.style.display = 'flex';
         document.getElementById('prod-demo-link').href = p.demo_url;
       }
 
@@ -170,11 +191,11 @@
       // Creator
       document.getElementById('prod-creator').innerHTML = `
         <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-4)">
-          <a href="/profile?u=${esc(cr.username)}" class="avatar avatar-lg ${col}" style="text-decoration:none">
+          <a href="/profile?u=${esc(cr.username)}" class="avatar avatar-lg ${col}" style="text-decoration:none;flex-shrink:0">
             ${cr.avatar_url?`<img src="${esc(cr.avatar_url)}" alt="">`:`${init}`}
           </a>
-          <div>
-            <a href="/profile?u=${esc(cr.username)}" style="font-weight:600;display:block;color:var(--text)">${esc(cr.full_name||cr.username)}</a>
+          <div style="min-width:0">
+            <a href="/profile?u=${esc(cr.username)}" style="font-weight:600;display:block;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(cr.full_name||cr.username)}</a>
             <div style="font-size:0.8rem;color:var(--muted-light)">@${esc(cr.username)}</div>
           </div>
         </div>
@@ -184,17 +205,17 @@
 
       // Stats
       document.getElementById('prod-stats').innerHTML = `
-        <div style="display:flex;justify-content:space-between;font-size:0.875rem">
-          <span style="color:var(--muted-light)">Downloads</span>
-          <span style="font-weight:600">${p.downloads_count||0}</span>
+        <div class="prod-stat-row">
+          <span>Downloads</span>
+          <span>${p.downloads_count||0}</span>
         </div>
-        <div style="display:flex;justify-content:space-between;font-size:0.875rem">
-          <span style="color:var(--muted-light)">Listed</span>
-          <span style="font-weight:500">${new Date(p.created_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</span>
+        <div class="prod-stat-row">
+          <span>Listed</span>
+          <span>${new Date(p.created_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</span>
         </div>
-        <div style="display:flex;justify-content:space-between;font-size:0.875rem">
-          <span style="color:var(--muted-light)">Category</span>
-          <span style="font-weight:500">${cat.emoji} ${cat.label}</span>
+        <div class="prod-stat-row">
+          <span>Category</span>
+          <span>${cat.emoji} ${cat.label}</span>
         </div>
       `;
 

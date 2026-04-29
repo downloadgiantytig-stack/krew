@@ -11,6 +11,20 @@
   <link rel="stylesheet" href="/css/animations.css">
   <link rel="stylesheet" href="/css/components.css">
   <link rel="stylesheet" href="/css/layout.css">
+  <style>
+    .mp-filter-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+      flex-wrap: wrap;
+    }
+    .mp-filter-row .search-bar { flex: 1; min-width: 200px; max-width: 360px; }
+    @media (max-width: 479px) {
+      .mp-filter-row { flex-direction: column; }
+      .mp-filter-row .search-bar { max-width: 100%; width: 100%; }
+    }
+  </style>
 </head>
 <body>
 <main class="page-content">
@@ -25,8 +39,8 @@
 
   <div class="container" style="padding-bottom:var(--space-16)">
     <!-- Filters -->
-    <div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-6);flex-wrap:wrap">
-      <div class="search-bar" style="flex:1;max-width:360px">
+    <div class="mp-filter-row">
+      <div class="search-bar">
         <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input type="search" id="mp-search" placeholder="Search products…" oninput="filterProducts()">
       </div>
@@ -43,7 +57,14 @@
 
     <!-- Skeletons -->
     <div id="mp-loading" class="grid grid-auto-fill" style="gap:var(--space-5)">
-      ${Array(8).fill(0).map(() => `<div class="card product-card" style="padding:0"><div class="skeleton" style="height:160px;border-radius:var(--radius) var(--radius) 0 0"></div><div style="padding:16px"><span class="skeleton" style="width:60px;height:18px;display:block;margin-bottom:10px;border-radius:99px"></span><span class="skeleton" style="width:85%;height:18px;display:block;margin-bottom:6px"></span><span class="skeleton" style="width:60%;height:16px;display:block;margin-bottom:16px"></span><div style="display:flex;justify-content:space-between;align-items:center"><span class="skeleton" style="width:50px;height:24px;display:block"></span><span class="skeleton" style="width:90px;height:32px;display:block;border-radius:8px"></span></div></div></div>`).join('')}
+      <div class="card product-card" style="padding:0"><div class="skeleton" style="height:160px;border-radius:var(--radius) var(--radius) 0 0"></div><div style="padding:16px"><span class="skeleton" style="width:60px;height:18px;display:block;margin-bottom:10px;border-radius:99px"></span><span class="skeleton" style="width:85%;height:18px;display:block;margin-bottom:6px"></span><span class="skeleton" style="width:60%;height:16px;display:block;margin-bottom:16px"></span><div style="display:flex;justify-content:space-between;align-items:center"><span class="skeleton" style="width:50px;height:24px;display:block"></span><span class="skeleton" style="width:90px;height:32px;display:block;border-radius:8px"></span></div></div></div>
+      <div class="card product-card" style="padding:0"><div class="skeleton" style="height:160px;border-radius:var(--radius) var(--radius) 0 0"></div><div style="padding:16px"><span class="skeleton" style="width:75px;height:18px;display:block;margin-bottom:10px;border-radius:99px"></span><span class="skeleton" style="width:75%;height:18px;display:block;margin-bottom:6px"></span><span class="skeleton" style="width:55%;height:16px;display:block;margin-bottom:16px"></span><div style="display:flex;justify-content:space-between;align-items:center"><span class="skeleton" style="width:60px;height:24px;display:block"></span><span class="skeleton" style="width:80px;height:32px;display:block;border-radius:8px"></span></div></div></div>
+      <div class="card product-card" style="padding:0"><div class="skeleton" style="height:160px;border-radius:var(--radius) var(--radius) 0 0"></div><div style="padding:16px"><span class="skeleton" style="width:65px;height:18px;display:block;margin-bottom:10px;border-radius:99px"></span><span class="skeleton" style="width:90%;height:18px;display:block;margin-bottom:6px"></span><span class="skeleton" style="width:65%;height:16px;display:block;margin-bottom:16px"></span><div style="display:flex;justify-content:space-between;align-items:center"><span class="skeleton" style="width:45px;height:24px;display:block"></span><span class="skeleton" style="width:95px;height:32px;display:block;border-radius:8px"></span></div></div></div>
+      <div class="card product-card" style="padding:0"><div class="skeleton" style="height:160px;border-radius:var(--radius) var(--radius) 0 0"></div><div style="padding:16px"><span class="skeleton" style="width:70px;height:18px;display:block;margin-bottom:10px;border-radius:99px"></span><span class="skeleton" style="width:80%;height:18px;display:block;margin-bottom:6px"></span><span class="skeleton" style="width:70%;height:16px;display:block;margin-bottom:16px"></span><div style="display:flex;justify-content:space-between;align-items:center"><span class="skeleton" style="width:55px;height:24px;display:block"></span><span class="skeleton" style="width:85px;height:32px;display:block;border-radius:8px"></span></div></div></div>
+      <div class="card product-card" style="padding:0"><div class="skeleton" style="height:160px;border-radius:var(--radius) var(--radius) 0 0"></div><div style="padding:16px"><span class="skeleton" style="width:55px;height:18px;display:block;margin-bottom:10px;border-radius:99px"></span><span class="skeleton" style="width:70%;height:18px;display:block;margin-bottom:6px"></span><span class="skeleton" style="width:50%;height:16px;display:block;margin-bottom:16px"></span><div style="display:flex;justify-content:space-between;align-items:center"><span class="skeleton" style="width:50px;height:24px;display:block"></span><span class="skeleton" style="width:90px;height:32px;display:block;border-radius:8px"></span></div></div></div>
+      <div class="card product-card" style="padding:0"><div class="skeleton" style="height:160px;border-radius:var(--radius) var(--radius) 0 0"></div><div style="padding:16px"><span class="skeleton" style="width:80px;height:18px;display:block;margin-bottom:10px;border-radius:99px"></span><span class="skeleton" style="width:88%;height:18px;display:block;margin-bottom:6px"></span><span class="skeleton" style="width:62%;height:16px;display:block;margin-bottom:16px"></span><div style="display:flex;justify-content:space-between;align-items:center"><span class="skeleton" style="width:60px;height:24px;display:block"></span><span class="skeleton" style="width:88px;height:32px;display:block;border-radius:8px"></span></div></div></div>
+      <div class="card product-card" style="padding:0"><div class="skeleton" style="height:160px;border-radius:var(--radius) var(--radius) 0 0"></div><div style="padding:16px"><span class="skeleton" style="width:68px;height:18px;display:block;margin-bottom:10px;border-radius:99px"></span><span class="skeleton" style="width:72%;height:18px;display:block;margin-bottom:6px"></span><span class="skeleton" style="width:58%;height:16px;display:block;margin-bottom:16px"></span><div style="display:flex;justify-content:space-between;align-items:center"><span class="skeleton" style="width:50px;height:24px;display:block"></span><span class="skeleton" style="width:92px;height:32px;display:block;border-radius:8px"></span></div></div></div>
+      <div class="card product-card" style="padding:0"><div class="skeleton" style="height:160px;border-radius:var(--radius) var(--radius) 0 0"></div><div style="padding:16px"><span class="skeleton" style="width:62px;height:18px;display:block;margin-bottom:10px;border-radius:99px"></span><span class="skeleton" style="width:82%;height:18px;display:block;margin-bottom:6px"></span><span class="skeleton" style="width:68%;height:16px;display:block;margin-bottom:16px"></span><div style="display:flex;justify-content:space-between;align-items:center"><span class="skeleton" style="width:48px;height:24px;display:block"></span><span class="skeleton" style="width:86px;height:32px;display:block;border-radius:8px"></span></div></div></div>
     </div>
 
     <div id="mp-grid" class="grid grid-auto-fill" style="gap:var(--space-5)"></div>
@@ -72,7 +93,8 @@
         <label class="form-label">Description *</label>
         <textarea class="input" id="p-desc" placeholder="What does it do? Who is it for? What's included?" rows="4" required></textarea>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)">
+      <!-- auto-collapses to 1-col on narrow screens -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--space-4)">
         <div class="form-group">
           <label class="form-label">Category *</label>
           <select class="input select" id="p-cat" required>
@@ -156,7 +178,7 @@
           ${(p.tags||[]).length?`<div class="tags" style="margin-bottom:8px">${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
             <div class="avatar avatar-sm ${col}">${c.avatar_url?`<img src="${esc(c.avatar_url)}" alt="">`:init}</div>
-            <span style="font-size:0.8rem;color:var(--muted-light)">${esc(c.username||'anon')}</span>
+            <span style="font-size:0.8rem;color:var(--muted-light);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.username||'anon')}</span>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between">
             <span style="font-family:var(--font-display);font-size:1.25rem;font-weight:700;${!p.price_usd?'color:var(--green)':''}">${formatPrice(p.price_usd)}</span>

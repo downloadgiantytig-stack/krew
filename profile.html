@@ -17,11 +17,69 @@
       border-bottom: 1px solid var(--border);
       padding: calc(var(--space-16) + 65px) 0 var(--space-10);
     }
+
+    .profile-hero-inner {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-6);
+      flex-wrap: wrap;
+    }
+
+    .profile-info {
+      flex: 1;
+      min-width: 0; /* prevent overflow */
+    }
+
+    .profile-name {
+      font-family: var(--font-display);
+      font-size: clamp(1.25rem, 4vw, 1.75rem);
+      font-weight: 700;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .profile-actions-wrap {
+      display: flex;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .profile-tabs-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .profile-tabs-row::-webkit-scrollbar { display: none; }
+
+    .profile-tab {
+      border-radius: 0;
+      border-bottom: 2px solid transparent;
+      padding: var(--space-3) var(--space-4);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .profile-tab.active { border-bottom-color: var(--purple-light); }
+
     .tab-content { display: none; }
     .tab-content.active { display: block; }
+
     .edit-field { display: none; }
     body.edit-mode .edit-field { display: block; }
     body.edit-mode .view-field { display: none; }
+
+    @media (max-width: 479px) {
+      .profile-hero-inner { gap: var(--space-4); }
+      .profile-actions-wrap { width: 100%; }
+      .profile-actions-wrap .btn { flex: 1; justify-content: center; }
+    }
   </style>
 </head>
 <body>
@@ -36,14 +94,14 @@
     <!-- Profile Hero -->
     <div class="profile-hero">
       <div class="container">
-        <div style="display:flex;align-items:flex-start;gap:var(--space-6);flex-wrap:wrap">
+        <div class="profile-hero-inner">
           <!-- Avatar -->
-          <div id="profile-avatar" class="avatar" style="width:96px;height:96px;font-size:2rem;border:3px solid var(--border-strong);flex-shrink:0"></div>
+          <div id="profile-avatar" class="avatar" style="width:clamp(72px,12vw,96px);height:clamp(72px,12vw,96px);font-size:clamp(1.5rem,4vw,2rem);border:3px solid var(--border-strong);flex-shrink:0"></div>
 
           <!-- Info -->
-          <div style="flex:1;min-width:200px">
-            <div id="profile-name" style="font-family:var(--font-display);font-size:1.75rem;font-weight:700;margin-bottom:4px"></div>
-            <div id="profile-username" style="font-size:1rem;color:var(--muted-light);margin-bottom:var(--space-4)"></div>
+          <div class="profile-info">
+            <div id="profile-name" class="profile-name"></div>
+            <div id="profile-username" style="font-size:clamp(0.875rem,2.5vw,1rem);color:var(--muted-light);margin-bottom:var(--space-4)"></div>
 
             <!-- View mode bio -->
             <p id="profile-bio" class="view-field" style="font-size:0.9375rem;color:var(--text-secondary);line-height:1.65;max-width:520px;margin-bottom:var(--space-4)"></p>
@@ -55,7 +113,7 @@
             <div id="profile-skills" class="tags view-field" style="margin-bottom:var(--space-4)"></div>
             <input class="input edit-field" id="edit-skills" placeholder="Skills (comma separated)" style="max-width:400px;margin-bottom:var(--space-4)">
 
-            <!-- Github view/edit -->
+            <!-- GitHub view/edit -->
             <div class="view-field" id="github-link-wrap" style="display:none">
               <a id="profile-github" href="#" target="_blank" class="btn btn-ghost btn-sm" style="gap:6px">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385c.6.105.825-.255.825-.57c0-.285-.015-1.23-.015-2.235c-3.015.555-3.795-.735-4.035-1.41c-.135-.345-.72-1.41-1.23-1.695c-.42-.225-1.02-.78-.015-.795c.945-.015 1.62.87 1.845 1.23c1.08 1.815 2.805 1.305 3.495.99c.105-.78.42-1.305.765-1.605c-2.67-.3-5.46-1.335-5.46-5.925c0-1.305.465-2.385 1.23-3.225c-.12-.3-.54-1.53.12-3.18c0 0 1.005-.315 3.3 1.23c.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23c.66 1.65.24 2.88.12 3.18c.765.84 1.23 1.905 1.23 3.225c0 4.605-2.805 5.625-5.475 5.925c.435.375.81 1.095.81 2.22c0 1.605-.015 2.895-.015 3.3c0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
@@ -66,18 +124,18 @@
           </div>
 
           <!-- Actions -->
-          <div style="display:flex;gap:var(--space-3);flex-shrink:0" id="profile-actions"></div>
+          <div class="profile-actions-wrap" id="profile-actions"></div>
         </div>
       </div>
     </div>
 
     <!-- Tabs + content -->
     <div class="container" style="padding-top:var(--space-8);padding-bottom:var(--space-16)">
-      <div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-8);border-bottom:1px solid var(--border)">
-        <button class="tab active" id="tab-squads" onclick="switchProfileTab('squads',this)" style="border-radius:0;border-bottom:2px solid var(--purple-light);padding:var(--space-3) var(--space-4)">
+      <div class="profile-tabs-row">
+        <button class="tab profile-tab active" id="tab-squads" onclick="switchProfileTab('squads',this)">
           Squads <span id="tab-squads-count" style="font-size:0.75rem;color:var(--muted-light);margin-left:4px"></span>
         </button>
-        <button class="tab" id="tab-products" onclick="switchProfileTab('products',this)" style="border-radius:0;border-bottom:2px solid transparent;padding:var(--space-3) var(--space-4)">
+        <button class="tab profile-tab" id="tab-products" onclick="switchProfileTab('products',this)">
           Products <span id="tab-products-count" style="font-size:0.75rem;color:var(--muted-light);margin-left:4px"></span>
         </button>
       </div>
@@ -132,13 +190,11 @@
   function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   window.switchProfileTab = (tab, el) => {
-    document.querySelectorAll('.tab').forEach(t=>{
+    document.querySelectorAll('.profile-tab').forEach(t => {
       t.classList.remove('active');
-      t.style.borderBottomColor='transparent';
     });
-    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
-    el.style.borderBottomColor='var(--purple-light)';
     document.getElementById(`content-${tab}`).classList.add('active');
   };
 
@@ -157,12 +213,12 @@
       const init     = getInitials(profileData.full_name||profileData.username||'?');
       const col      = getAvatarColor(profileData.username||'');
       avatarEl.className = `avatar ${col}`;
-      avatarEl.style.cssText = 'width:96px;height:96px;font-size:2rem;border:3px solid var(--border-strong);flex-shrink:0';
+      avatarEl.style.cssText = 'width:clamp(72px,12vw,96px);height:clamp(72px,12vw,96px);font-size:clamp(1.5rem,4vw,2rem);border:3px solid var(--border-strong);flex-shrink:0';
       avatarEl.innerHTML = profileData.avatar_url ? `<img src="${esc(profileData.avatar_url)}" alt="">` : init;
 
       // Name / username
-      document.getElementById('profile-name').textContent     = profileData.full_name || profileData.username || '';
-      document.getElementById('profile-username').textContent  = `@${profileData.username}`;
+      document.getElementById('profile-name').textContent    = profileData.full_name || profileData.username || '';
+      document.getElementById('profile-username').textContent = `@${profileData.username}`;
 
       // Bio
       const bioEl = document.getElementById('profile-bio');
@@ -170,8 +226,7 @@
       bioEl.style.color = profileData.bio ? 'var(--text-secondary)' : 'var(--muted)';
 
       // Skills
-      const skillsEl = document.getElementById('profile-skills');
-      skillsEl.innerHTML = (profileData.skills||[]).map(s=>`<span class="skill-chip">${esc(s)}</span>`).join('');
+      document.getElementById('profile-skills').innerHTML = (profileData.skills||[]).map(s=>`<span class="skill-chip">${esc(s)}</span>`).join('');
 
       // GitHub
       if (profileData.github_url) {
@@ -186,9 +241,8 @@
       document.getElementById('edit-github').value = profileData.github_url||'';
 
       // Actions
-      const actionsEl = document.getElementById('profile-actions');
       if (isOwnProfile) {
-        actionsEl.innerHTML = `
+        document.getElementById('profile-actions').innerHTML = `
           <button class="btn btn-secondary" id="edit-toggle-btn" onclick="toggleEdit()">Edit Profile</button>
           <button class="btn btn-primary hidden" id="save-btn" onclick="saveProfile()">Save →</button>
           <button class="btn btn-ghost hidden" id="cancel-btn" onclick="toggleEdit(true)">Cancel</button>
@@ -198,7 +252,6 @@
       document.getElementById('profile-loading').style.display='none';
       document.getElementById('profile-content').classList.remove('hidden');
 
-      // Load squads + products
       loadSquads();
       loadProducts();
     } catch (err) {
@@ -220,9 +273,9 @@
         const sl  = { open:'Open', in_progress:'In Progress', completed:'Completed' }[s.status]||'Open';
         return `
           <a href="/squad?id=${s.id}" class="card squad-card" style="text-decoration:none;display:flex;flex-direction:column;gap:12px">
-            <div style="display:flex;justify-content:space-between">
+            <div style="display:flex;justify-content:space-between;align-items:center">
               <span class="badge ${sc}">${sl}</span>
-              ${s.role==='owner'?`<span class="tag green">★ Owner</span>`:''}
+              ${s.role==='owner'?`<span class="tag" style="background:rgba(16,185,129,0.1);color:var(--green);border-color:rgba(16,185,129,0.2)">★ Owner</span>`:''}
             </div>
             <div>
               <h3 style="font-size:1rem;font-family:var(--font-display);font-weight:600;margin-bottom:5px">${esc(s.name)}</h3>
@@ -254,7 +307,7 @@
             <div style="padding:16px">
               <span class="category-chip" style="margin-bottom:8px;display:inline-block">${cat.emoji} ${cat.label}</span>
               <h3 style="font-size:0.9375rem;font-weight:600;margin-bottom:8px;font-family:var(--font-display)">${esc(p.title)}</h3>
-              <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
                 <span style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;${!p.price_usd?'color:var(--green)':''}">${formatPrice(p.price_usd)}</span>
                 <a href="${esc(p.checkout_url)}" target="_blank" rel="noopener" class="btn btn-primary btn-sm" onclick="event.stopPropagation()">${isg?'Gumroad':'Buy'} ↗</a>
               </div>
@@ -283,7 +336,6 @@
     try {
       await updateProfile(user.id, { bio, skills, github_url: github });
       profileData = { ...profileData, bio, skills, github_url: github };
-      // Update view
       document.getElementById('profile-bio').textContent = bio || 'Add a bio…';
       document.getElementById('profile-skills').innerHTML = skills.map(s=>`<span class="skill-chip">${esc(s)}</span>`).join('');
       if (github) {

@@ -11,6 +11,24 @@
   <link rel="stylesheet" href="/css/animations.css">
   <link rel="stylesheet" href="/css/components.css">
   <link rel="stylesheet" href="/css/layout.css">
+  <style>
+    .explore-filter-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+      flex-wrap: wrap;
+    }
+    .explore-filter-row .tabs { flex: 1; min-width: 0; }
+    #result-count { font-size: 0.8125rem; color: var(--muted-light); white-space: nowrap; }
+
+    @media (max-width: 479px) {
+      .explore-filter-row { flex-direction: column; align-items: flex-start; }
+      .explore-filter-row .tabs { width: 100%; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+      .explore-filter-row .tabs::-webkit-scrollbar { display: none; }
+    }
+  </style>
 </head>
 <body>
   <main class="page-content">
@@ -31,13 +49,13 @@
 
     <div class="container" style="padding-bottom:var(--space-16)">
       <!-- Filter tabs -->
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);margin-bottom:var(--space-6);flex-wrap:wrap">
+      <div class="explore-filter-row">
         <div class="tabs" style="width:auto">
           <button class="tab active" data-filter="all">All</button>
           <button class="tab" data-filter="squads">Squads 👥</button>
           <button class="tab" data-filter="products">Marketplace 🛒</button>
         </div>
-        <span id="result-count" style="font-size:0.8125rem;color:var(--muted-light)"></span>
+        <span id="result-count"></span>
       </div>
 
       <!-- Category chips (shows only when products filter active) -->
@@ -53,18 +71,12 @@
 
       <!-- Skeleton loaders -->
       <div id="feed-skeletons" class="grid grid-auto-fill" style="gap:var(--space-5)">
-        ${Array(6).fill(0).map(() => `
-          <div class="card" style="height:240px">
-            <div style="display:flex;gap:8px;margin-bottom:12px">
-              <span class="skeleton" style="width:60px;height:22px;border-radius:99px"></span>
-              <span class="skeleton" style="width:80px;height:22px;border-radius:99px"></span>
-            </div>
-            <span class="skeleton" style="width:80%;height:20px;display:block;margin-bottom:8px"></span>
-            <span class="skeleton" style="width:60%;height:16px;display:block;margin-bottom:16px"></span>
-            <span class="skeleton" style="width:100%;height:14px;display:block;margin-bottom:6px"></span>
-            <span class="skeleton" style="width:90%;height:14px;display:block;margin-bottom:6px"></span>
-          </div>
-        `).join('')}
+        <div class="card" style="height:240px"><div style="display:flex;gap:8px;margin-bottom:12px"><span class="skeleton" style="width:60px;height:22px;border-radius:99px"></span><span class="skeleton" style="width:80px;height:22px;border-radius:99px"></span></div><span class="skeleton" style="width:80%;height:20px;display:block;margin-bottom:8px"></span><span class="skeleton" style="width:60%;height:16px;display:block;margin-bottom:16px"></span><span class="skeleton" style="width:100%;height:14px;display:block;margin-bottom:6px"></span><span class="skeleton" style="width:90%;height:14px;display:block"></span></div>
+        <div class="card" style="height:240px"><div style="display:flex;gap:8px;margin-bottom:12px"><span class="skeleton" style="width:70px;height:22px;border-radius:99px"></span><span class="skeleton" style="width:90px;height:22px;border-radius:99px"></span></div><span class="skeleton" style="width:75%;height:20px;display:block;margin-bottom:8px"></span><span class="skeleton" style="width:55%;height:16px;display:block;margin-bottom:16px"></span><span class="skeleton" style="width:100%;height:14px;display:block;margin-bottom:6px"></span><span class="skeleton" style="width:85%;height:14px;display:block"></span></div>
+        <div class="card" style="height:240px"><div style="display:flex;gap:8px;margin-bottom:12px"><span class="skeleton" style="width:65px;height:22px;border-radius:99px"></span><span class="skeleton" style="width:75px;height:22px;border-radius:99px"></span></div><span class="skeleton" style="width:70%;height:20px;display:block;margin-bottom:8px"></span><span class="skeleton" style="width:50%;height:16px;display:block;margin-bottom:16px"></span><span class="skeleton" style="width:95%;height:14px;display:block;margin-bottom:6px"></span><span class="skeleton" style="width:80%;height:14px;display:block"></span></div>
+        <div class="card" style="height:240px"><div style="display:flex;gap:8px;margin-bottom:12px"><span class="skeleton" style="width:60px;height:22px;border-radius:99px"></span><span class="skeleton" style="width:85px;height:22px;border-radius:99px"></span></div><span class="skeleton" style="width:82%;height:20px;display:block;margin-bottom:8px"></span><span class="skeleton" style="width:62%;height:16px;display:block;margin-bottom:16px"></span><span class="skeleton" style="width:100%;height:14px;display:block;margin-bottom:6px"></span><span class="skeleton" style="width:88%;height:14px;display:block"></span></div>
+        <div class="card" style="height:240px"><div style="display:flex;gap:8px;margin-bottom:12px"><span class="skeleton" style="width:55px;height:22px;border-radius:99px"></span><span class="skeleton" style="width:95px;height:22px;border-radius:99px"></span></div><span class="skeleton" style="width:78%;height:20px;display:block;margin-bottom:8px"></span><span class="skeleton" style="width:58%;height:16px;display:block;margin-bottom:16px"></span><span class="skeleton" style="width:100%;height:14px;display:block;margin-bottom:6px"></span><span class="skeleton" style="width:92%;height:14px;display:block"></span></div>
+        <div class="card" style="height:240px"><div style="display:flex;gap:8px;margin-bottom:12px"><span class="skeleton" style="width:68px;height:22px;border-radius:99px"></span><span class="skeleton" style="width:78px;height:22px;border-radius:99px"></span></div><span class="skeleton" style="width:72%;height:20px;display:block;margin-bottom:8px"></span><span class="skeleton" style="width:52%;height:16px;display:block;margin-bottom:16px"></span><span class="skeleton" style="width:98%;height:14px;display:block;margin-bottom:6px"></span><span class="skeleton" style="width:83%;height:14px;display:block"></span></div>
       </div>
 
       <!-- Feed grid -->
@@ -75,7 +87,7 @@
         <div class="empty-icon">🔭</div>
         <h3>Nothing here yet</h3>
         <p>Be the first to create a squad or list a product on the marketplace.</p>
-        <div style="display:flex;gap:12px;justify-content:center">
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
           <a href="/squads" class="btn btn-outline">Create Squad</a>
           <a href="/marketplace" class="btn btn-primary">List Product</a>
         </div>
